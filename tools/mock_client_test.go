@@ -1890,3 +1890,511 @@ func (m *mockTruenasClient) CloudBackupTransferSettingChoices(ctx context.Contex
 	}
 	return res, nil
 }
+
+// --- Certificate management ---
+
+func (m *mockTruenasClient) ListCertificates(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.Certificate, error) {
+	var res []truenas.Certificate
+	if err := m.call(ctx, "certificate_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetCertificate(ctx context.Context, id int) (*truenas.Certificate, error) {
+	var res truenas.Certificate
+	if err := m.call(ctx, "certificate_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateCertificate(ctx context.Context, p *truenas.CreateCertificateParams) (*truenas.Certificate, error) {
+	var res truenas.Certificate
+	if err := m.call(ctx, "certificate_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateCertificate(ctx context.Context, id int, p *truenas.CreateCertificateParams) (*truenas.Certificate, error) {
+	var res truenas.Certificate
+	if err := m.call(ctx, "certificate_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteCertificate(ctx context.Context, id int) error {
+	return m.call(ctx, "certificate_delete", id, nil)
+}
+
+func (m *mockTruenasClient) CertificateACMEServerChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "certificate_acme_server_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) CertificateCountryChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "certificate_country_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) CertificateECCurveChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "certificate_ec_curve_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) CertificateExtendedKeyUsageChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "certificate_extended_key_usage_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// --- Core system (connectivity, introspection, job utilities) ---
+
+func (m *mockTruenasClient) Ping(ctx context.Context) (string, error) {
+	var res string
+	if err := m.call(ctx, "core_ping", nil, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) PingRemote(ctx context.Context, params map[string]any) (string, error) {
+	var res string
+	if err := m.call(ctx, "core_ping_remote", params, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetMethods(ctx context.Context, app string) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "core_get_methods", app, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetServices(ctx context.Context) ([]map[string]any, error) {
+	var res []map[string]any
+	if err := m.call(ctx, "core_get_services", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) JobDownloadLogs(ctx context.Context, jobID int) (string, error) {
+	var res string
+	if err := m.call(ctx, "core_job_download_logs", jobID, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) JobWait(ctx context.Context, jobID int) (*truenas.Job, error) {
+	var res truenas.Job
+	if err := m.call(ctx, "core_job_wait", jobID, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) ARP(ctx context.Context, iface string) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "core_arp", iface, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) Bulk(ctx context.Context, method string, paramsList [][]any) ([]any, error) {
+	var res []any
+	if err := m.call(ctx, "core_bulk", []any{method, paramsList}, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) Download(ctx context.Context, method string, args []any, filename string) (*truenas.CoreDownloadResult, error) {
+	var res truenas.CoreDownloadResult
+	if err := m.call(ctx, "core_download", []any{method, args, filename}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) ResizeShell(ctx context.Context, id string, cols, rows int) error {
+	return m.call(ctx, "core_resize_shell", []any{id, cols, rows}, nil)
+}
+
+func (m *mockTruenasClient) Subscribe(ctx context.Context, event string) (string, error) {
+	var res string
+	if err := m.call(ctx, "core_subscribe", event, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) Unsubscribe(ctx context.Context, subscriptionID string) error {
+	return m.call(ctx, "core_unsubscribe", subscriptionID, nil)
+}
+
+// --- Directory services ---
+
+func (m *mockTruenasClient) DirectoryServicesCacheRefresh(ctx context.Context) error {
+	return m.call(ctx, "directoryservices_cache_refresh", nil, nil)
+}
+
+func (m *mockTruenasClient) DirectoryServicesCertificateChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "directoryservices_certificate_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DirectoryServicesConfigGet(ctx context.Context) (*truenas.DirectoryServicesConfig, error) {
+	var res truenas.DirectoryServicesConfig
+	if err := m.call(ctx, "directoryservices_config", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DirectoryServicesLeave(ctx context.Context, params map[string]any) error {
+	return m.call(ctx, "directoryservices_leave", params, nil)
+}
+
+func (m *mockTruenasClient) DirectoryServicesStatusGet(ctx context.Context) (*truenas.DirectoryServicesStatus, error) {
+	var res truenas.DirectoryServicesStatus
+	if err := m.call(ctx, "directoryservices_status", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DirectoryServicesSyncKeytab(ctx context.Context) error {
+	return m.call(ctx, "directoryservices_sync_keytab", nil, nil)
+}
+
+func (m *mockTruenasClient) UpdateDirectoryServices(ctx context.Context, p *truenas.UpdateDirectoryServicesParams) (*truenas.DirectoryServicesConfig, error) {
+	var res truenas.DirectoryServicesConfig
+	if err := m.call(ctx, "directoryservices_update", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// --- Disk management ---
+
+func (m *mockTruenasClient) QueryDisks(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.Disk, error) {
+	var res []truenas.Disk
+	if err := m.call(ctx, "disk_query", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DiskDetails(ctx context.Context) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "disk_details", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DiskGetUsed(ctx context.Context, name string) (int64, error) {
+	var res int64
+	if err := m.call(ctx, "disk_get_used", name, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DiskTemperatureAggGet(ctx context.Context, names []string, days int) (map[string]truenas.DiskTemperatureAgg, error) {
+	var res map[string]truenas.DiskTemperatureAgg
+	if err := m.call(ctx, "disk_temperature_agg", []any{names, days}, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DiskTemperatureAlerts(ctx context.Context, names []string) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "disk_temperature_alerts", names, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DiskTemperatures(ctx context.Context, names []string) (map[string]int, error) {
+	var res map[string]int
+	if err := m.call(ctx, "disk_temperatures", names, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) UpdateDisk(ctx context.Context, identifier string, p *truenas.UpdateDiskParams) (*truenas.Disk, error) {
+	var res truenas.Disk
+	if err := m.call(ctx, "disk_update", []any{identifier, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) WipeDisk(ctx context.Context, identifier string, p *truenas.WipeDiskParams) (int, error) {
+	var res int
+	if err := m.call(ctx, "disk_wipe", []any{identifier, p}, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+// --- Replication tasks and endpoints ---
+
+func (m *mockTruenasClient) ListReplicationTasks(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.ReplicationTask, error) {
+	var res []truenas.ReplicationTask
+	if err := m.call(ctx, "replication_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetReplicationTask(ctx context.Context, id int) (*truenas.ReplicationTask, error) {
+	var res truenas.ReplicationTask
+	if err := m.call(ctx, "replication_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateReplicationTask(ctx context.Context, p *truenas.CreateReplicationParams) (*truenas.ReplicationTask, error) {
+	var res truenas.ReplicationTask
+	if err := m.call(ctx, "replication_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateReplicationTask(ctx context.Context, id int, p *truenas.CreateReplicationParams) (*truenas.ReplicationTask, error) {
+	var res truenas.ReplicationTask
+	if err := m.call(ctx, "replication_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteReplicationTask(ctx context.Context, id int) error {
+	return m.call(ctx, "replication_delete", id, nil)
+}
+
+func (m *mockTruenasClient) TestReplicationTask(ctx context.Context, id int) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "replication_test", id, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) ReplicationSchemas(ctx context.Context) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "replication_schemas", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) ReplicationGlobalConfigGet(ctx context.Context) (*truenas.ReplicationGlobalConfig, error) {
+	var res truenas.ReplicationGlobalConfig
+	if err := m.call(ctx, "replication_global_config", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateReplicationGlobal(ctx context.Context, p *truenas.UpdateReplicationGlobalParams) (*truenas.ReplicationGlobalConfig, error) {
+	var res truenas.ReplicationGlobalConfig
+	if err := m.call(ctx, "replication_global_update", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) ListReplicationEndpoints(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.ReplicationEndpoint, error) {
+	var res []truenas.ReplicationEndpoint
+	if err := m.call(ctx, "replication_endpoint_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetReplicationEndpoint(ctx context.Context, id int) (*truenas.ReplicationEndpoint, error) {
+	var res truenas.ReplicationEndpoint
+	if err := m.call(ctx, "replication_endpoint_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateReplicationEndpoint(ctx context.Context, p *truenas.CreateReplicationEndpointParams) (*truenas.ReplicationEndpoint, error) {
+	var res truenas.ReplicationEndpoint
+	if err := m.call(ctx, "replication_endpoint_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateReplicationEndpoint(ctx context.Context, id int, p *truenas.CreateReplicationEndpointParams) (*truenas.ReplicationEndpoint, error) {
+	var res truenas.ReplicationEndpoint
+	if err := m.call(ctx, "replication_endpoint_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteReplicationEndpoint(ctx context.Context, id int) error {
+	return m.call(ctx, "replication_endpoint_delete", id, nil)
+}
+
+// --- User management ---
+
+func (m *mockTruenasClient) ListUsers(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.User, error) {
+	var res []truenas.User
+	if err := m.call(ctx, "user_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetUser(ctx context.Context, id int) (*truenas.User, error) {
+	var res truenas.User
+	if err := m.call(ctx, "user_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateUser(ctx context.Context, p *truenas.CreateUserParams) (*truenas.User, error) {
+	var res truenas.User
+	if err := m.call(ctx, "user_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateUser(ctx context.Context, id int, p *truenas.CreateUserParams) (*truenas.User, error) {
+	var res truenas.User
+	if err := m.call(ctx, "user_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteUser(ctx context.Context, id int) error {
+	return m.call(ctx, "user_delete", id, nil)
+}
+
+func (m *mockTruenasClient) UpdateUserPassword(ctx context.Context, id int, password string) error {
+	return m.call(ctx, "user_update_password", []any{id, password}, nil)
+}
+
+func (m *mockTruenasClient) UserSchemas(ctx context.Context) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "user_schemas", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) UserHomeDirectoryChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "user_home_directory_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) UserShellChoices(ctx context.Context) (map[string]string, error) {
+	var res map[string]string
+	if err := m.call(ctx, "user_shell_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// --- Cron jobs ---
+
+func (m *mockTruenasClient) ListCronJobs(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.CronJob, error) {
+	var res []truenas.CronJob
+	if err := m.call(ctx, "cronjob_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetCronJob(ctx context.Context, id int) (*truenas.CronJob, error) {
+	var res truenas.CronJob
+	if err := m.call(ctx, "cronjob_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateCronJob(ctx context.Context, p *truenas.CreateCronJobParams) (*truenas.CronJob, error) {
+	var res truenas.CronJob
+	if err := m.call(ctx, "cronjob_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateCronJob(ctx context.Context, id int, p *truenas.CreateCronJobParams) (*truenas.CronJob, error) {
+	var res truenas.CronJob
+	if err := m.call(ctx, "cronjob_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteCronJob(ctx context.Context, id int) error {
+	return m.call(ctx, "cronjob_delete", id, nil)
+}
+
+func (m *mockTruenasClient) RunCronJob(ctx context.Context, id int) (int, error) {
+	var res int
+	if err := m.call(ctx, "cronjob_run", id, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+// --- Device info and DNS ---
+
+func (m *mockTruenasClient) DeviceGetInfo(ctx context.Context, deviceType string) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "device_get_info", deviceType, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DNSQuery(ctx context.Context) (*truenas.DNSConfig, error) {
+	var res truenas.DNSConfig
+	if err := m.call(ctx, "dns_query", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}

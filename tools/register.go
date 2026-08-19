@@ -41,6 +41,15 @@ func RegisterAll(s *mcp.Server, client truenasClient, cfg Config) {
 	registerAuthTools(s, client)
 	registerAlertManagementTools(s, client)
 	registerCloudBackupTools(s, client)
+	registerCertificateTools(s, client)
+	registerCoreTools(s, client)
+	registerDirectoryServicesTools(s, client)
+	registerDiskTools(s, client)
+	registerReplicationTools(s, client)
+	registerReplicationEndpointTools(s, client)
+	registerUserTools(s, client)
+	registerCronJobTools(s, client)
+	registerMiscTools(s, client)
 	if cfg.AllowDestructive {
 		registerDestructiveTools(s, client)
 		registerISCSIDestructiveTools(s, client)
@@ -49,5 +58,10 @@ func RegisterAll(s *mcp.Server, client truenasClient, cfg Config) {
 		registerAppManagementDestructiveTools(s, client)
 		registerAlertManagementDestructiveTools(s, client)
 		registerCloudBackupDestructiveTools(s, client)
+		registerCertificateDestructiveTools(s, client)
+		registerDiskDestructiveTools(s, client)
+		registerReplicationDestructiveTools(s, client)
+		registerUserDestructiveTools(s, client)
+		registerCronJobDestructiveTools(s, client)
 	}
 }

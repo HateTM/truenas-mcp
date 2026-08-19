@@ -298,4 +298,87 @@ type truenasClient interface {
 	ListCloudBackupSnapshots(ctx context.Context, id int) ([]truenas.CloudBackupSnapshot, error)
 	ListCloudBackupSnapshotDirectory(ctx context.Context, id int, snapshotID, path string) ([]truenas.DirEntry, error)
 	CloudBackupTransferSettingChoices(ctx context.Context) ([]string, error)
+
+	// Certificate management
+	ListCertificates(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.Certificate, error)
+	GetCertificate(ctx context.Context, id int) (*truenas.Certificate, error)
+	CreateCertificate(ctx context.Context, p *truenas.CreateCertificateParams) (*truenas.Certificate, error)
+	UpdateCertificate(ctx context.Context, id int, p *truenas.CreateCertificateParams) (*truenas.Certificate, error)
+	DeleteCertificate(ctx context.Context, id int) error
+	CertificateACMEServerChoices(ctx context.Context) (map[string]string, error)
+	CertificateCountryChoices(ctx context.Context) (map[string]string, error)
+	CertificateECCurveChoices(ctx context.Context) (map[string]string, error)
+	CertificateExtendedKeyUsageChoices(ctx context.Context) (map[string]string, error)
+
+	// Core system (connectivity, introspection, job utilities)
+	Ping(ctx context.Context) (string, error)
+	PingRemote(ctx context.Context, params map[string]any) (string, error)
+	GetMethods(ctx context.Context, app string) (map[string]any, error)
+	GetServices(ctx context.Context) ([]map[string]any, error)
+	JobDownloadLogs(ctx context.Context, jobID int) (string, error)
+	JobWait(ctx context.Context, jobID int) (*truenas.Job, error)
+	ARP(ctx context.Context, iface string) (map[string]string, error)
+	Bulk(ctx context.Context, method string, paramsList [][]any) ([]any, error)
+	Download(ctx context.Context, method string, args []any, filename string) (*truenas.CoreDownloadResult, error)
+	ResizeShell(ctx context.Context, id string, cols, rows int) error
+	Subscribe(ctx context.Context, event string) (string, error)
+	Unsubscribe(ctx context.Context, subscriptionID string) error
+
+	// Directory services
+	DirectoryServicesCacheRefresh(ctx context.Context) error
+	DirectoryServicesCertificateChoices(ctx context.Context) (map[string]string, error)
+	DirectoryServicesConfigGet(ctx context.Context) (*truenas.DirectoryServicesConfig, error)
+	DirectoryServicesLeave(ctx context.Context, params map[string]any) error
+	DirectoryServicesStatusGet(ctx context.Context) (*truenas.DirectoryServicesStatus, error)
+	DirectoryServicesSyncKeytab(ctx context.Context) error
+	UpdateDirectoryServices(ctx context.Context, p *truenas.UpdateDirectoryServicesParams) (*truenas.DirectoryServicesConfig, error)
+
+	// Disk management
+	QueryDisks(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.Disk, error)
+	DiskDetails(ctx context.Context) (map[string]any, error)
+	DiskGetUsed(ctx context.Context, name string) (int64, error)
+	DiskTemperatureAggGet(ctx context.Context, names []string, days int) (map[string]truenas.DiskTemperatureAgg, error)
+	DiskTemperatureAlerts(ctx context.Context, names []string) ([]string, error)
+	DiskTemperatures(ctx context.Context, names []string) (map[string]int, error)
+	UpdateDisk(ctx context.Context, identifier string, p *truenas.UpdateDiskParams) (*truenas.Disk, error)
+	WipeDisk(ctx context.Context, identifier string, p *truenas.WipeDiskParams) (int, error)
+
+	// Replication tasks and endpoints
+	ListReplicationTasks(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.ReplicationTask, error)
+	GetReplicationTask(ctx context.Context, id int) (*truenas.ReplicationTask, error)
+	CreateReplicationTask(ctx context.Context, p *truenas.CreateReplicationParams) (*truenas.ReplicationTask, error)
+	UpdateReplicationTask(ctx context.Context, id int, p *truenas.CreateReplicationParams) (*truenas.ReplicationTask, error)
+	DeleteReplicationTask(ctx context.Context, id int) error
+	TestReplicationTask(ctx context.Context, id int) (map[string]any, error)
+	ReplicationSchemas(ctx context.Context) (map[string]any, error)
+	ReplicationGlobalConfigGet(ctx context.Context) (*truenas.ReplicationGlobalConfig, error)
+	UpdateReplicationGlobal(ctx context.Context, p *truenas.UpdateReplicationGlobalParams) (*truenas.ReplicationGlobalConfig, error)
+	ListReplicationEndpoints(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.ReplicationEndpoint, error)
+	GetReplicationEndpoint(ctx context.Context, id int) (*truenas.ReplicationEndpoint, error)
+	CreateReplicationEndpoint(ctx context.Context, p *truenas.CreateReplicationEndpointParams) (*truenas.ReplicationEndpoint, error)
+	UpdateReplicationEndpoint(ctx context.Context, id int, p *truenas.CreateReplicationEndpointParams) (*truenas.ReplicationEndpoint, error)
+	DeleteReplicationEndpoint(ctx context.Context, id int) error
+
+	// User management
+	ListUsers(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.User, error)
+	GetUser(ctx context.Context, id int) (*truenas.User, error)
+	CreateUser(ctx context.Context, p *truenas.CreateUserParams) (*truenas.User, error)
+	UpdateUser(ctx context.Context, id int, p *truenas.CreateUserParams) (*truenas.User, error)
+	DeleteUser(ctx context.Context, id int) error
+	UpdateUserPassword(ctx context.Context, id int, password string) error
+	UserSchemas(ctx context.Context) (map[string]any, error)
+	UserHomeDirectoryChoices(ctx context.Context) (map[string]string, error)
+	UserShellChoices(ctx context.Context) (map[string]string, error)
+
+	// Cron jobs
+	ListCronJobs(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.CronJob, error)
+	GetCronJob(ctx context.Context, id int) (*truenas.CronJob, error)
+	CreateCronJob(ctx context.Context, p *truenas.CreateCronJobParams) (*truenas.CronJob, error)
+	UpdateCronJob(ctx context.Context, id int, p *truenas.CreateCronJobParams) (*truenas.CronJob, error)
+	DeleteCronJob(ctx context.Context, id int) error
+	RunCronJob(ctx context.Context, id int) (int, error)
+
+	// Device info and DNS
+	DeviceGetInfo(ctx context.Context, deviceType string) (map[string]any, error)
+	DNSQuery(ctx context.Context) (*truenas.DNSConfig, error)
 }

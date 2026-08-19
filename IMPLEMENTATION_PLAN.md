@@ -1,6 +1,6 @@
 # План реализации всех недостающих инструментов TrueNAS MCP
 
-## Статус: 193 реализовано, 67 остаются (из 260 методов, отслеживаемых этим чек-листом)
+## Статус: 260 реализовано, 0 остаётся (из 260 методов, отслеживаемых этим чек-листом) — план закрыт полностью
 
 **Приоритет 1 (CRITICAL) и Приоритет 2 (HIGH) закрыты целиком.**
 
@@ -19,8 +19,19 @@ mock-интерфейс (`tools/client_iface.go`), MCP-инструменты (`
 Деструктивные операции (delete/*) вынесены в отдельные `tools/destructive_*.go` файлы —
 каждый в пределах правила «300 строк», гейт `Config.AllowDestructive` сохранён.
 
-Осталось: Приоритеты 3-4 (Certificate Management, Core System, Directory Services,
-Disk Management, Replication, User Management, Cron Jobs, Device Management, DNS).
+**Приоритет 3 (MEDIUM) закрыт целиком** — Certificate Management (9), Core System (остаток,
+12 — `core.job_wait()` переиспользует существующий `PollJob()` вместо дублирования
+long-poll логики), Directory Services (7), Disk Management (8, включая деструктивный
+`disk.wipe()`), Replication (14, разбито на `replication.go`/`replication_endpoint.go`
+по инструкции тикета) — итого 50 методов.
+
+**Приоритет 4 (LOW) закрыт целиком** — User Management (9, `user.delete()` и
+`user.update_password()` вынесены в `tools/destructive_user.go` по требованию тикета —
+удаление аккаунта и смена пароля гейтятся так же, как остальные необратимые операции),
+Cron Jobs (6), Device Management + DNS (2, один файл `misc.go` на оба — тикет описывает их
+как две самые маленькие оставшиеся категории) — итого 17 методов.
+
+Больше нечего реализовывать по этому чек-листу.
 
 Пересчитано по факту: для каждого метода ниже проверено, есть ли в `internal/truenas/*.go` клиентский метод, который
 семантически выполняет именно эту TrueNAS RPC-операцию (по строке, передаваемой в `c.call(...)`, либо — для части
