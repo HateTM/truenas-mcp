@@ -1502,3 +1502,391 @@ func (m *mockTruenasClient) UpdateNFSConfig(ctx context.Context, p *truenas.Upda
 	}
 	return &res, nil
 }
+
+// --- App management (registries, images, catalog metadata) ---
+
+func (m *mockTruenasClient) ListAppRegistries(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.AppRegistry, error) {
+	var res []truenas.AppRegistry
+	if err := m.call(ctx, "app_registry_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetAppRegistry(ctx context.Context, id int) (*truenas.AppRegistry, error) {
+	var res truenas.AppRegistry
+	if err := m.call(ctx, "app_registry_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateAppRegistry(ctx context.Context, p *truenas.CreateAppRegistryParams) (*truenas.AppRegistry, error) {
+	var res truenas.AppRegistry
+	if err := m.call(ctx, "app_registry_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateAppRegistry(ctx context.Context, id int, p *truenas.CreateAppRegistryParams) (*truenas.AppRegistry, error) {
+	var res truenas.AppRegistry
+	if err := m.call(ctx, "app_registry_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteAppRegistry(ctx context.Context, id int) error {
+	return m.call(ctx, "app_registry_delete", id, nil)
+}
+
+func (m *mockTruenasClient) PullAppImage(ctx context.Context, p *truenas.PullAppImageParams) (int, error) {
+	var res int
+	if err := m.call(ctx, "app_image_pull", p, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) AppImageDockerHubRateLimitGet(ctx context.Context) (*truenas.DockerHubRateLimit, error) {
+	var res truenas.DockerHubRateLimit
+	if err := m.call(ctx, "app_image_dockerhub_rate_limit", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) GetAppImage(ctx context.Context, id string) (*truenas.Image, error) {
+	var res truenas.Image
+	if err := m.call(ctx, "app_image_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) AppCategories(ctx context.Context) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "app_categories", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) AppAvailableSpaceGet(ctx context.Context) (*truenas.AppAvailableSpace, error) {
+	var res truenas.AppAvailableSpace
+	if err := m.call(ctx, "app_available_space", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) AppConfigGet(ctx context.Context) (*truenas.AppGlobalConfig, error) {
+	var res truenas.AppGlobalConfig
+	if err := m.call(ctx, "app_config", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) AppContainerIDs(ctx context.Context, appName string) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "app_container_ids", appName, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) ConvertAppToCustom(ctx context.Context, appName string) (*truenas.App, error) {
+	var res truenas.App
+	if err := m.call(ctx, "app_convert_to_custom", appName, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) AppOutdatedDockerImages(ctx context.Context, appName string) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "app_outdated_docker_images", appName, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) PullAppImages(ctx context.Context, appName string) (int, error) {
+	var res int
+	if err := m.call(ctx, "app_pull_images", appName, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+// --- Authentication ---
+
+func (m *mockTruenasClient) GenerateOnetimePassword(ctx context.Context) (string, error) {
+	var res string
+	if err := m.call(ctx, "auth_generate_onetime_password", nil, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GenerateToken(ctx context.Context, ttl int) (string, error) {
+	var res string
+	if err := m.call(ctx, "auth_generate_token", ttl, &res); err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) Logout(ctx context.Context) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "auth_logout", nil, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) Me(ctx context.Context) (*truenas.UserIdentity, error) {
+	var res truenas.UserIdentity
+	if err := m.call(ctx, "auth_me", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) AuthMechanismChoices(ctx context.Context) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "auth_mechanism_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) AuthSessionsList(ctx context.Context) ([]truenas.AuthSession, error) {
+	var res []truenas.AuthSession
+	if err := m.call(ctx, "auth_sessions", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) SetAuthAttribute(ctx context.Context, key string, value any) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "auth_set_attribute", []any{key, value}, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) TerminateOtherSessions(ctx context.Context) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "auth_terminate_other_sessions", nil, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) TerminateSession(ctx context.Context, id string) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "auth_terminate_session", id, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) TwoFactorEnabled(ctx context.Context) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "auth_twofactor", nil, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) TwoFactorConfigGet(ctx context.Context) (*truenas.TwoFactorConfig, error) {
+	var res truenas.TwoFactorConfig
+	if err := m.call(ctx, "auth_twofactor_config", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateTwoFactor(ctx context.Context, p *truenas.UpdateTwoFactorParams) (*truenas.TwoFactorConfig, error) {
+	var res truenas.TwoFactorConfig
+	if err := m.call(ctx, "auth_twofactor_update", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// --- Alert management (categories, policies, services, classes) ---
+
+func (m *mockTruenasClient) AlertListCategories(ctx context.Context) ([]truenas.AlertCategory, error) {
+	var res []truenas.AlertCategory
+	if err := m.call(ctx, "alert_list_categories", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) AlertListPolicies(ctx context.Context) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "alert_list_policies", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DismissAlert(ctx context.Context, uuid string) error {
+	return m.call(ctx, "alert_dismiss", uuid, nil)
+}
+
+func (m *mockTruenasClient) RestoreAlert(ctx context.Context, uuid string) error {
+	return m.call(ctx, "alert_restore", uuid, nil)
+}
+
+func (m *mockTruenasClient) ListAlertServices(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.AlertService, error) {
+	var res []truenas.AlertService
+	if err := m.call(ctx, "alertservice_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetAlertService(ctx context.Context, id int) (*truenas.AlertService, error) {
+	var res truenas.AlertService
+	if err := m.call(ctx, "alertservice_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateAlertService(ctx context.Context, p *truenas.CreateAlertServiceParams) (*truenas.AlertService, error) {
+	var res truenas.AlertService
+	if err := m.call(ctx, "alertservice_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateAlertService(ctx context.Context, id int, p *truenas.CreateAlertServiceParams) (*truenas.AlertService, error) {
+	var res truenas.AlertService
+	if err := m.call(ctx, "alertservice_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteAlertService(ctx context.Context, id int) error {
+	return m.call(ctx, "alertservice_delete", id, nil)
+}
+
+func (m *mockTruenasClient) TestAlertService(ctx context.Context, p *truenas.CreateAlertServiceParams) (bool, error) {
+	var res bool
+	if err := m.call(ctx, "alertservice_test", p, &res); err != nil {
+		return false, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) AlertClassesConfigGet(ctx context.Context) (*truenas.AlertClassesConfig, error) {
+	var res truenas.AlertClassesConfig
+	if err := m.call(ctx, "alertclasses_config", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateAlertClasses(ctx context.Context, p *truenas.UpdateAlertClassesParams) (*truenas.AlertClassesConfig, error) {
+	var res truenas.AlertClassesConfig
+	if err := m.call(ctx, "alertclasses_update", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// --- Cloud Backup (restic) ---
+
+func (m *mockTruenasClient) ListCloudBackups(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.CloudBackupTask, error) {
+	var res []truenas.CloudBackupTask
+	if err := m.call(ctx, "cloud_backup_list", opts, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) GetCloudBackup(ctx context.Context, id int) (*truenas.CloudBackupTask, error) {
+	var res truenas.CloudBackupTask
+	if err := m.call(ctx, "cloud_backup_get", id, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) CreateCloudBackup(ctx context.Context, p *truenas.CreateCloudBackupParams) (*truenas.CloudBackupTask, error) {
+	var res truenas.CloudBackupTask
+	if err := m.call(ctx, "cloud_backup_create", p, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) UpdateCloudBackup(ctx context.Context, id int, p *truenas.CreateCloudBackupParams) (*truenas.CloudBackupTask, error) {
+	var res truenas.CloudBackupTask
+	if err := m.call(ctx, "cloud_backup_update", []any{id, p}, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (m *mockTruenasClient) DeleteCloudBackup(ctx context.Context, id int) error {
+	return m.call(ctx, "cloud_backup_delete", id, nil)
+}
+
+func (m *mockTruenasClient) AbortCloudBackup(ctx context.Context, id int) error {
+	return m.call(ctx, "cloud_backup_abort", id, nil)
+}
+
+func (m *mockTruenasClient) SyncCloudBackup(ctx context.Context, id int) (int, error) {
+	var res int
+	if err := m.call(ctx, "cloud_backup_sync", id, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) RestoreCloudBackup(ctx context.Context, id int, p *truenas.CloudBackupRestoreParams) (int, error) {
+	var res int
+	if err := m.call(ctx, "cloud_backup_restore", []any{id, p}, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) DeleteCloudBackupSnapshot(ctx context.Context, id int, snapshotID string) error {
+	return m.call(ctx, "cloud_backup_delete_snapshot", []any{id, snapshotID}, nil)
+}
+
+func (m *mockTruenasClient) ListCloudBackupSnapshots(ctx context.Context, id int) ([]truenas.CloudBackupSnapshot, error) {
+	var res []truenas.CloudBackupSnapshot
+	if err := m.call(ctx, "cloud_backup_list_snapshots", id, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) ListCloudBackupSnapshotDirectory(ctx context.Context, id int, snapshotID, path string) ([]truenas.DirEntry, error) {
+	var res []truenas.DirEntry
+	if err := m.call(ctx, "cloud_backup_list_snapshot_directory", []any{id, snapshotID, path}, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (m *mockTruenasClient) CloudBackupTransferSettingChoices(ctx context.Context) ([]string, error) {
+	var res []string
+	if err := m.call(ctx, "cloud_backup_transfer_setting_choices", nil, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}

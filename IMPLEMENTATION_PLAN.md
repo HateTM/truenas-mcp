@@ -1,16 +1,26 @@
 # План реализации всех недостающих инструментов TrueNAS MCP
 
-## Статус: 138 реализовано, 122 остаются (из 260 методов, отслеживаемых этим чек-листом)
+## Статус: 193 реализовано, 67 остаются (из 260 методов, отслеживаемых этим чек-листом)
 
-**Приоритет 1 (CRITICAL) закрыт целиком** — Pool Management (остаток), iSCSI, NVMe-oF,
-Sharing NFS/SMB/WebDAV (102 метода) реализованы: клиентский слой (`internal/truenas/`),
+**Приоритет 1 (CRITICAL) и Приоритет 2 (HIGH) закрыты целиком.**
+
+Приоритет 1 — Pool Management (остаток), iSCSI, NVMe-oF, Sharing NFS/SMB/WebDAV (102 метода).
+Приоритет 2 — App Management (остаток, 15), Authentication (12 из 16 реализованы как
+инструменты; `auth.login()`, `auth.login_ex()`, `auth.login_ex_continue()`,
+`auth.login_with_token()` намеренно не выставлены как инструменты — позволяют
+аутентифицироваться под произвольной личностью, у MCP-сервера нет легитимного сценария
+смены identity в рамках сессии, см. doc-комментарий в `internal/truenas/auth.go`; эти 4
+метода засчитаны как «закрытые» той же логикой, что и изначально исключённый
+`auth.login_with_api_key`), Alert Management (остаток, 12), Cloud Backup (12) — итого 55
+методов чек-листа закрыто (51 инструмент + 4 документированных исключения).
+
+Все реализованы по стандартной трёхслойной схеме: клиентский слой (`internal/truenas/`),
 mock-интерфейс (`tools/client_iface.go`), MCP-инструменты (`tools/*.go`) и тесты для всех.
-Деструктивные операции (delete/*) вынесены в `tools/destructive_iscsi.go`,
-`tools/destructive_nvmeof.go`, `tools/destructive_sharing.go` — каждый файл в пределах
-правила «300 строк», гейт `Config.AllowDestructive` сохранён. Осталось: Приоритеты 2-4
-(App Management, Authentication, Alert Management, Cloud Backup, Certificate Management,
-Core System, Directory Services, Disk Management, Replication, User Management, Cron Jobs,
-Device Management, DNS).
+Деструктивные операции (delete/*) вынесены в отдельные `tools/destructive_*.go` файлы —
+каждый в пределах правила «300 строк», гейт `Config.AllowDestructive` сохранён.
+
+Осталось: Приоритеты 3-4 (Certificate Management, Core System, Directory Services,
+Disk Management, Replication, User Management, Cron Jobs, Device Management, DNS).
 
 Пересчитано по факту: для каждого метода ниже проверено, есть ли в `internal/truenas/*.go` клиентский метод, который
 семантически выполняет именно эту TrueNAS RPC-операцию (по строке, передаваемой в `c.call(...)`, либо — для части

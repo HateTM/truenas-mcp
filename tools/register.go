@@ -37,10 +37,17 @@ func RegisterAll(s *mcp.Server, client truenasClient, cfg Config) {
 	registerNVMeOFPortTools(s, client)
 	registerSharingTools(s, client)
 	registerNFSConfigTools(s, client)
+	registerAppManagementTools(s, client)
+	registerAuthTools(s, client)
+	registerAlertManagementTools(s, client)
+	registerCloudBackupTools(s, client)
 	if cfg.AllowDestructive {
 		registerDestructiveTools(s, client)
 		registerISCSIDestructiveTools(s, client)
 		registerNVMeOFDestructiveTools(s, client)
 		registerSharingDestructiveTools(s, client)
+		registerAppManagementDestructiveTools(s, client)
+		registerAlertManagementDestructiveTools(s, client)
+		registerCloudBackupDestructiveTools(s, client)
 	}
 }

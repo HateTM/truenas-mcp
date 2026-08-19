@@ -239,4 +239,63 @@ type truenasClient interface {
 	GetNFS3Clients(ctx context.Context) ([]truenas.NFSClient, error)
 	GetNFS4Clients(ctx context.Context) ([]truenas.NFSClient, error)
 	UpdateNFSConfig(ctx context.Context, p *truenas.UpdateNFSConfigParams) (*truenas.NFSConfig, error)
+
+	// App management (registries, images, catalog metadata)
+	ListAppRegistries(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.AppRegistry, error)
+	GetAppRegistry(ctx context.Context, id int) (*truenas.AppRegistry, error)
+	CreateAppRegistry(ctx context.Context, p *truenas.CreateAppRegistryParams) (*truenas.AppRegistry, error)
+	UpdateAppRegistry(ctx context.Context, id int, p *truenas.CreateAppRegistryParams) (*truenas.AppRegistry, error)
+	DeleteAppRegistry(ctx context.Context, id int) error
+	PullAppImage(ctx context.Context, p *truenas.PullAppImageParams) (int, error)
+	AppImageDockerHubRateLimitGet(ctx context.Context) (*truenas.DockerHubRateLimit, error)
+	GetAppImage(ctx context.Context, id string) (*truenas.Image, error)
+	AppCategories(ctx context.Context) ([]string, error)
+	AppAvailableSpaceGet(ctx context.Context) (*truenas.AppAvailableSpace, error)
+	AppConfigGet(ctx context.Context) (*truenas.AppGlobalConfig, error)
+	AppContainerIDs(ctx context.Context, appName string) ([]string, error)
+	ConvertAppToCustom(ctx context.Context, appName string) (*truenas.App, error)
+	AppOutdatedDockerImages(ctx context.Context, appName string) ([]string, error)
+	PullAppImages(ctx context.Context, appName string) (int, error)
+
+	// Authentication
+	GenerateOnetimePassword(ctx context.Context) (string, error)
+	GenerateToken(ctx context.Context, ttl int) (string, error)
+	Logout(ctx context.Context) (bool, error)
+	Me(ctx context.Context) (*truenas.UserIdentity, error)
+	AuthMechanismChoices(ctx context.Context) ([]string, error)
+	AuthSessionsList(ctx context.Context) ([]truenas.AuthSession, error)
+	SetAuthAttribute(ctx context.Context, key string, value any) (bool, error)
+	TerminateOtherSessions(ctx context.Context) (bool, error)
+	TerminateSession(ctx context.Context, id string) (bool, error)
+	TwoFactorEnabled(ctx context.Context) (bool, error)
+	TwoFactorConfigGet(ctx context.Context) (*truenas.TwoFactorConfig, error)
+	UpdateTwoFactor(ctx context.Context, p *truenas.UpdateTwoFactorParams) (*truenas.TwoFactorConfig, error)
+
+	// Alert management (categories, policies, services, classes)
+	AlertListCategories(ctx context.Context) ([]truenas.AlertCategory, error)
+	AlertListPolicies(ctx context.Context) ([]string, error)
+	DismissAlert(ctx context.Context, uuid string) error
+	RestoreAlert(ctx context.Context, uuid string) error
+	ListAlertServices(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.AlertService, error)
+	GetAlertService(ctx context.Context, id int) (*truenas.AlertService, error)
+	CreateAlertService(ctx context.Context, p *truenas.CreateAlertServiceParams) (*truenas.AlertService, error)
+	UpdateAlertService(ctx context.Context, id int, p *truenas.CreateAlertServiceParams) (*truenas.AlertService, error)
+	DeleteAlertService(ctx context.Context, id int) error
+	TestAlertService(ctx context.Context, p *truenas.CreateAlertServiceParams) (bool, error)
+	AlertClassesConfigGet(ctx context.Context) (*truenas.AlertClassesConfig, error)
+	UpdateAlertClasses(ctx context.Context, p *truenas.UpdateAlertClassesParams) (*truenas.AlertClassesConfig, error)
+
+	// Cloud Backup (restic)
+	ListCloudBackups(ctx context.Context, opts ...truenas.ListOptions) ([]truenas.CloudBackupTask, error)
+	GetCloudBackup(ctx context.Context, id int) (*truenas.CloudBackupTask, error)
+	CreateCloudBackup(ctx context.Context, p *truenas.CreateCloudBackupParams) (*truenas.CloudBackupTask, error)
+	UpdateCloudBackup(ctx context.Context, id int, p *truenas.CreateCloudBackupParams) (*truenas.CloudBackupTask, error)
+	DeleteCloudBackup(ctx context.Context, id int) error
+	AbortCloudBackup(ctx context.Context, id int) error
+	SyncCloudBackup(ctx context.Context, id int) (int, error)
+	RestoreCloudBackup(ctx context.Context, id int, p *truenas.CloudBackupRestoreParams) (int, error)
+	DeleteCloudBackupSnapshot(ctx context.Context, id int, snapshotID string) error
+	ListCloudBackupSnapshots(ctx context.Context, id int) ([]truenas.CloudBackupSnapshot, error)
+	ListCloudBackupSnapshotDirectory(ctx context.Context, id int, snapshotID, path string) ([]truenas.DirEntry, error)
+	CloudBackupTransferSettingChoices(ctx context.Context) ([]string, error)
 }
