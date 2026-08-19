@@ -162,6 +162,7 @@ All configuration is via environment variables:
 | `TRUENAS_API_KEY` | yes | API key from TrueNAS UI |
 | `TRUENAS_INSECURE` | no | `true` to skip TLS verification (self-signed certs) |
 | `TRUENAS_ALLOW_DESTRUCTIVE` | no | `true` to enable destructive tools (default: disabled) |
+| `TRUENAS_MCP_DOMAINS` | no | Comma-separated list of API domains to register (default: all). Shrinks the tool schema sent to MCP clients — e.g. `pool,dataset,snapshot` for a storage-only deployment cuts the payload to ~20% of the full set. Valid values: `system`, `pool`, `dataset`, `snapshot`, `vm`, `app`, `iscsi`, `nvmeof`, `sharing`, `cloudsync`, `cloudbackup`, `auth`, `alert`, `certificate`, `core`, `directoryservices`, `disk`, `replication`, `user`, `cronjob` |
 
 ## MCP Client Setup
 

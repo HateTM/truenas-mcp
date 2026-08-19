@@ -14,6 +14,11 @@
 //	                          context has no deadline (default: 60). Raise this if
 //	                          long-running mutations (cloudsync.sync, app.create, app.start)
 //	                          time out client-side under heavy host load.
+//	TRUENAS_MCP_DOMAINS       Comma-separated list of TrueNAS API domains to register tools
+//	                          for (default: all domains). Restricting this shrinks the tool
+//	                          schema payload sent to MCP clients — e.g. TRUENAS_MCP_DOMAINS=
+//	                          pool,dataset,snapshot for a storage-only deployment. See
+//	                          tools.AllDomains for the full list of valid values.
 //
 // Flags:
 //
@@ -30,6 +35,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -67,6 +73,10 @@ func run() error {
 	}
 	insecure := os.Getenv("TRUENAS_INSECURE") == "true"
 	allowDestructive := os.Getenv("TRUENAS_ALLOW_DESTRUCTIVE") == "true"
+	domains, err := parseDomains(os.Getenv("TRUENAS_MCP_DOMAINS"))
+	if err != nil {
+		return err
+	}
 
 	client, err := truenas.NewClient(apiURL, apiKey, insecure)
 	if err != nil {
@@ -89,7 +99,7 @@ func run() error {
 		Version: version,
 	}, nil)
 
-	tools.RegisterAll(server, client, tools.Config{AllowDestructive: allowDestructive})
+	tools.RegisterAll(server, client, tools.Config{AllowDestructive: allowDestructive, Domains: domains})
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -147,4 +157,30 @@ func requireEnv(name string) (string, error) {
 		return "", fmt.Errorf("required environment variable %s is not set", name)
 	}
 	return v, nil
+}
+
+// parseDomains parses a comma-separated TRUENAS_MCP_DOMAINS value into a
+// domain list, validating each entry against tools.AllDomains. An empty
+// input returns a nil slice, meaning "register every domain".
+func parseDomains(raw string) ([]string, error) {
+	if raw == "" {
+		return nil, nil
+	}
+	valid := make(map[string]bool, len(tools.AllDomains))
+	for _, d := range tools.AllDomains {
+		valid[d] = true
+	}
+	parts := strings.Split(raw, ",")
+	domains := make([]string, 0, len(parts))
+	for _, p := range parts {
+		d := strings.TrimSpace(p)
+		if d == "" {
+			continue
+		}
+		if !valid[d] {
+			return nil, fmt.Errorf("TRUENAS_MCP_DOMAINS: unknown domain %q (valid: %s)", d, strings.Join(tools.AllDomains, ", "))
+		}
+		domains = append(domains, d)
+	}
+	return domains, nil
 }
