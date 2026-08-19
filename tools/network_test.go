@@ -11,8 +11,10 @@ import (
 func TestListInterfaces(t *testing.T) {
 	t.Run("returns interfaces as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listInterfacesFn: func(_ context.Context) ([]truenas.Interface, error) {
-				return []truenas.Interface{{Name: "eth0"}}, nil
+			DispatchMap: map[string]any{
+				"list_interfaces": func(_ context.Context) ([]truenas.Interface, error) {
+					return []truenas.Interface{{Name: "eth0"}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -24,8 +26,10 @@ func TestListInterfaces(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listInterfacesFn: func(_ context.Context) ([]truenas.Interface, error) {
-				return nil, errors.New("API error")
+			DispatchMap: map[string]any{
+				"list_interfaces": func(_ context.Context) ([]truenas.Interface, error) {
+					return nil, errors.New("API error")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)

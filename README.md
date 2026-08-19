@@ -15,12 +15,19 @@ An MCP server that exposes [TrueNAS SCALE](https://www.truenas.com/truenas-scale
 | Tool | Description | Parameters |
 |---|---|---|
 | `list_interfaces` | List all network interfaces (bridges, physical, bonds, VLANs) — useful for finding bridge names when attaching VM NICs | _(none)_ |
+| `get_interface` | Get detailed information about a specific network interface | `id` (string, required) |
+| `update_interface` | Update a network interface description | `id` (string, required); `description` (string, required) |
 
 ### Filesystem
 
 | Tool | Description | Parameters |
 |---|---|---|
 | `list_directory` | List the contents of a directory on the TrueNAS host filesystem | `path` (string, required) |
+| `make_directory` | Create a directory at the given absolute path | `path` (string, required); `mode` (string, optional) |
+| `read_file` | Read the full contents of a file as UTF-8 text | `path` (string, required) |
+| `write_file` | Write text content to a file | `path` (string, required); `content` (string, required); `append` (bool, optional) |
+| `stat_file` | Get metadata for a file or directory | `path` (string, required) |
+| `stat_filesystem` | Get capacity information for a filesystem | `path` (string, required) |
 
 ### Storage
 
@@ -28,9 +35,12 @@ An MCP server that exposes [TrueNAS SCALE](https://www.truenas.com/truenas-scale
 |---|---|---|
 | `list_pools` | List all ZFS storage pools and their status, size, and health | `limit`, `offset` (int, optional — server-side pagination) |
 | `get_pool` | Get detailed information about a specific ZFS pool | `id` (int) |
+| `create_pool` | Create a new ZFS pool | `name` (string, required); `disks`, `layout` (required) |
+| `update_pool` | Update an existing ZFS pool name | `id` (int, required); `name` (string, required) |
 | `list_datasets` | List ZFS datasets and zvols, optionally filtered by pool | `pool` (string, optional); `limit`, `offset` (int, optional — server-side pagination) |
 | `get_dataset` | Get detailed information about a specific ZFS dataset or zvol by its full path | `id` (string, e.g. `Storage/backups`) |
-| `create_dataset` | Create a new ZFS dataset or zvol | `name` (string, required); `type`, `compression`, `comments`, `quota`, `volsize` (optional — `volsize` in bytes is required when `type=VOLUME`) |
+| `create_dataset` | Create a new ZFS dataset or zvol | `name` (string, required); `type`, `compression`, `comments`, `quota`, `volsize` (optional) |
+| `update_dataset` | Update a ZFS dataset's description (comments) or quota | `id` (string, required); `comments`, `quota` (optional) |
 
 ### Virtual Machines
 
@@ -62,6 +72,31 @@ An MCP server that exposes [TrueNAS SCALE](https://www.truenas.com/truenas-scale
 | `upgrade_summary` | Get upgrade availability and changelog for an app | `name` (string) |
 | `rollback_app` | Roll an app back to a previous version; returns async job ID immediately | `name` (string); `version` (string, required) |
 
+### Cloud Sync
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `list_cloud_providers` | List supported Cloud Sync providers | _(none)_ |
+| `list_cloud_credentials` | List all stored Cloud Sync credentials | `limit`, `offset` (int, optional) |
+| `create_cloud_credential` | Create a Cloud Sync credential | `name` (string, required); `provider` (string, required); `attributes` (object, required) |
+| `list_cloudsync_tasks` | List all configured Cloud Sync Tasks | `limit`, `offset` (int, optional) |
+| `create_cloudsync_task` | Create a Cloud Sync Task | `path`, `credentials`, `direction`, `transfer_mode` (required); `description`, `attributes`, `extra`, `enabled` (optional) |
+| `run_cloudsync_task` | Run a Cloud Sync Task | `id` (int, required); `dry_run` (bool, optional) |
+| `abort_cloudsync_task` | Abort a running Cloud Sync Task job | `id` (int, required) |
+
+### Jobs
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `get_job` | Get the current state of a TrueNAS job by ID | `id` (int, required) |
+| `abort_job` | Abort a running TrueNAS job by ID | `id` (int, required) |
+
+### Alerts
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `list_alerts` | List current TrueNAS system alerts | _(none)_ |
+
 ### ZFS Snapshots
 
 | Tool | Description | Parameters |
@@ -79,6 +114,8 @@ An MCP server that exposes [TrueNAS SCALE](https://www.truenas.com/truenas-scale
 | `delete_snapshot` | Permanently delete a ZFS snapshot | `id` (string, e.g. `Storage/backups@before-upgrade`); `confirmed: true` (required) |
 | `delete_vm_device` | Remove a hardware device from a VM by device ID | `id` (int); `confirmed: true` (required) |
 | `rollback_snapshot` | Roll a dataset back to a previous snapshot — **all data written after the snapshot is permanently destroyed** | `id` (string); `confirmed: true` (required); `recursive`, `recursive_clones`, `force` (optional) |
+| `delete_dataset` | Permanently delete a ZFS dataset or zvol | `id` (string, required); `confirmed: true` (required) |
+| `delete_pool` | Permanently delete a ZFS pool | `id` (int, required); `confirmed: true` (required) |
 
 ## Installation
 
@@ -274,3 +311,6 @@ make test            # tests only (with race detector)
 make build           # build only → bin/truenas-mcp
 make clean           # remove bin/truenas-mcp
 ```
+
+<!-- Morph Test -->
+This file was modified by Sisyphus to test `morph_edit`.

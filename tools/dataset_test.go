@@ -11,8 +11,10 @@ import (
 func TestListDatasets(t *testing.T) {
 	t.Run("returns datasets as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listDatasetsFn: func(_ context.Context, _ string, _ ...truenas.ListOptions) ([]truenas.Dataset, error) {
-				return []truenas.Dataset{{ID: "tank/data"}}, nil
+			DispatchMap: map[string]any{
+				"list_datasets": func(_ context.Context, _ string, _ ...truenas.ListOptions) ([]truenas.Dataset, error) {
+					return []truenas.Dataset{{ID: 1}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -24,8 +26,10 @@ func TestListDatasets(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listDatasetsFn: func(_ context.Context, _ string, _ ...truenas.ListOptions) ([]truenas.Dataset, error) {
-				return nil, errors.New("API error")
+			DispatchMap: map[string]any{
+				"list_datasets": func(_ context.Context, _ string, _ ...truenas.ListOptions) ([]truenas.Dataset, error) {
+					return nil, errors.New("API error")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -39,8 +43,10 @@ func TestListDatasets(t *testing.T) {
 func TestGetDataset(t *testing.T) {
 	t.Run("returns dataset as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getDatasetFn: func(_ context.Context, id string) (*truenas.Dataset, error) {
-				return &truenas.Dataset{ID: id}, nil
+			DispatchMap: map[string]any{
+				"get_dataset": func(_ context.Context, id string) (*truenas.Dataset, error) {
+					return &truenas.Dataset{ID: 1}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -60,8 +66,10 @@ func TestGetDataset(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getDatasetFn: func(_ context.Context, _ string) (*truenas.Dataset, error) {
-				return nil, errors.New("dataset not found")
+			DispatchMap: map[string]any{
+				"get_dataset": func(_ context.Context, _ string) (*truenas.Dataset, error) {
+					return nil, errors.New("dataset not found")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -75,8 +83,10 @@ func TestGetDataset(t *testing.T) {
 func TestCreateDataset(t *testing.T) {
 	t.Run("returns created dataset as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			createDatasetFn: func(_ context.Context, p *truenas.CreateDatasetParams) (*truenas.Dataset, error) {
-				return &truenas.Dataset{ID: p.Name}, nil
+			DispatchMap: map[string]any{
+				"create_dataset": func(_ context.Context, p *truenas.CreateDatasetParams) (*truenas.Dataset, error) {
+					return &truenas.Dataset{ID: 1}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -96,8 +106,10 @@ func TestCreateDataset(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			createDatasetFn: func(_ context.Context, _ *truenas.CreateDatasetParams) (*truenas.Dataset, error) {
-				return nil, errors.New("dataset already exists")
+			DispatchMap: map[string]any{
+				"create_dataset": func(_ context.Context, _ *truenas.CreateDatasetParams) (*truenas.Dataset, error) {
+					return nil, errors.New("dataset already exists")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)

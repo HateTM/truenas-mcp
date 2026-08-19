@@ -153,4 +153,104 @@ func registerDestructiveTools(s *mcp.Server, client truenasClient) {
 		}
 		return jsonResult(map[string]any{"rolled_back": true, "id": p.ID})
 	})
+
+	type deleteCloudCredentialInput struct {
+		ID        int  `json:"id"        jsonschema:"ID of the Cloud Sync credential (from list_cloud_credentials)"`
+		Confirmed bool `json:"confirmed" jsonschema:"Must be set to true to confirm deletion"`
+	}
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "delete_cloud_credential",
+		Description: "Permanently delete a Cloud Sync credential by ID. Fails if any Cloud Sync Task still references it. Set confirmed=true to proceed.",
+		Annotations: &mcp.ToolAnnotations{
+			ReadOnlyHint:    false,
+			DestructiveHint: &destructiveHint,
+		},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p deleteCloudCredentialInput) (*mcp.CallToolResult, any, error) {
+		if !p.Confirmed {
+			return errorResult(errors.New("delete_cloud_credential: confirmed must be true to proceed with deletion"))
+		}
+		if p.ID <= 0 {
+			return errorResult(errors.New("delete_cloud_credential: id must be a positive integer"))
+		}
+		if err := client.DeleteCloudCredential(ctx, p.ID); err != nil {
+			return errorResult(fmt.Errorf("delete_cloud_credential: %w", err))
+		}
+		return jsonResult(map[string]any{"deleted": true, "id": p.ID})
+	})
+
+	type deleteCloudSyncTaskInput struct {
+		ID        int  `json:"id"        jsonschema:"ID of the Cloud Sync Task (from list_cloudsync_tasks)"`
+		Confirmed bool `json:"confirmed" jsonschema:"Must be set to true to confirm deletion"`
+	}
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "delete_cloudsync_task",
+		Description: "Permanently delete a Cloud Sync Task by ID. Set confirmed=true to proceed.",
+		Annotations: &mcp.ToolAnnotations{
+			ReadOnlyHint:    false,
+			DestructiveHint: &destructiveHint,
+		},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p deleteCloudSyncTaskInput) (*mcp.CallToolResult, any, error) {
+		if !p.Confirmed {
+			return errorResult(errors.New("delete_cloudsync_task: confirmed must be true to proceed with deletion"))
+		}
+		if p.ID <= 0 {
+			return errorResult(errors.New("delete_cloudsync_task: id must be a positive integer"))
+		}
+		if err := client.DeleteCloudSyncTask(ctx, p.ID); err != nil {
+			return errorResult(fmt.Errorf("delete_cloudsync_task: %w", err))
+		}
+		return jsonResult(map[string]any{"deleted": true, "id": p.ID})
+	})
+
+	type deleteDatasetInput struct {
+		ID        string `json:"id"        jsonschema:"Full dataset path, e.g. Storage/backups"`
+		Confirmed bool   `json:"confirmed" jsonschema:"Must be set to true to confirm deletion"`
+	}
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "delete_dataset",
+		Description: "Permanently delete a ZFS dataset or zvol. Set confirmed=true to proceed.",
+		Annotations: &mcp.ToolAnnotations{
+			ReadOnlyHint:    false,
+			DestructiveHint: &destructiveHint,
+		},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p deleteDatasetInput) (*mcp.CallToolResult, any, error) {
+		if !p.Confirmed {
+			return errorResult(errors.New("delete_dataset: confirmed must be true to proceed with deletion"))
+		}
+		if p.ID == "" {
+			return errorResult(errors.New("delete_dataset: id must not be empty"))
+		}
+		if err := client.DeleteDataset(ctx, p.ID); err != nil {
+			return errorResult(fmt.Errorf("delete_dataset: %w", err))
+		}
+		return jsonResult(map[string]any{"deleted": true, "id": p.ID})
+	})
+
+	type deletePoolInput struct {
+		ID        int  `json:"id"        jsonschema:"Numeric pool ID"`
+		Confirmed bool `json:"confirmed" jsonschema:"Must be set to true to confirm deletion"`
+	}
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "delete_pool",
+		Description: "Permanently delete a ZFS pool. Set confirmed=true to proceed.",
+		Annotations: &mcp.ToolAnnotations{
+			ReadOnlyHint:    false,
+			DestructiveHint: &destructiveHint,
+		},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p deletePoolInput) (*mcp.CallToolResult, any, error) {
+		if !p.Confirmed {
+			return errorResult(errors.New("delete_pool: confirmed must be true to proceed with deletion"))
+		}
+		if p.ID <= 0 {
+			return errorResult(errors.New("delete_pool: id must be a positive integer"))
+		}
+		if err := client.DeletePool(ctx, p.ID); err != nil {
+			return errorResult(fmt.Errorf("delete_pool: %w", err))
+		}
+		return jsonResult(map[string]any{"deleted": true, "id": p.ID})
+	})
 }

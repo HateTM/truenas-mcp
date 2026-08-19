@@ -21,7 +21,26 @@ func RegisterAll(s *mcp.Server, client truenasClient, cfg Config) {
 	registerVMTools(s, client)
 	registerAppTools(s, client)
 	registerSnapshotTools(s, client)
+	registerCloudSyncTools(s, client)
+	registerJobTools(s, client)
+	registerAlertTools(s, client)
+	// Register pool management tools
+	RegisterPoolManagementTools(s, client)
+	registerPoolDatasetChoicesTools(s, client)
+	registerISCSIAuthTools(s, client)
+	registerISCSIExtentTools(s, client)
+	registerISCSIPortalTools(s, client)
+	registerISCSITargetTools(s, client)
+	registerNVMeOFHostTools(s, client)
+	registerNVMeOFSubsysTools(s, client)
+	registerNVMeOFNamespaceTools(s, client)
+	registerNVMeOFPortTools(s, client)
+	registerSharingTools(s, client)
+	registerNFSConfigTools(s, client)
 	if cfg.AllowDestructive {
 		registerDestructiveTools(s, client)
+		registerISCSIDestructiveTools(s, client)
+		registerNVMeOFDestructiveTools(s, client)
+		registerSharingDestructiveTools(s, client)
 	}
 }

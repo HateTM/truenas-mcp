@@ -11,8 +11,10 @@ import (
 func TestListVMs(t *testing.T) {
 	t.Run("returns VMs as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listVMsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.VM, error) {
-				return []truenas.VM{{ID: 1, Name: "pbs"}}, nil
+			DispatchMap: map[string]any{
+				"list_vms": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.VM, error) {
+					return []truenas.VM{{ID: 1, Name: "pbs"}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -24,8 +26,10 @@ func TestListVMs(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listVMsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.VM, error) {
-				return nil, errors.New("API error")
+			DispatchMap: map[string]any{
+				"list_vms": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.VM, error) {
+					return nil, errors.New("API error")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -39,8 +43,10 @@ func TestListVMs(t *testing.T) {
 func TestGetVM(t *testing.T) {
 	t.Run("returns VM as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getVMFn: func(_ context.Context, id int) (*truenas.VM, error) {
-				return &truenas.VM{ID: id, Name: "pbs"}, nil
+			DispatchMap: map[string]any{
+				"get_vm": func(_ context.Context, id int) (*truenas.VM, error) {
+					return &truenas.VM{ID: id, Name: "pbs"}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -60,8 +66,10 @@ func TestGetVM(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getVMFn: func(_ context.Context, _ int) (*truenas.VM, error) {
-				return nil, errors.New("VM not found")
+			DispatchMap: map[string]any{
+				"get_vm": func(_ context.Context, _ int) (*truenas.VM, error) {
+					return nil, errors.New("VM not found")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -75,8 +83,10 @@ func TestGetVM(t *testing.T) {
 func TestStartVM(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			startVMFn: func(_ context.Context, _ int) (int, error) {
-				return 42, nil
+			DispatchMap: map[string]any{
+				"start_vm": func(_ context.Context, _ int) (int, error) {
+					return 42, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -96,8 +106,10 @@ func TestStartVM(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			startVMFn: func(_ context.Context, _ int) (int, error) {
-				return 0, errors.New("VM already running")
+			DispatchMap: map[string]any{
+				"start_vm": func(_ context.Context, _ int) (int, error) {
+					return 0, errors.New("VM already running")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -111,8 +123,10 @@ func TestStartVM(t *testing.T) {
 func TestStopVM(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			stopVMFn: func(_ context.Context, _ int, _ bool) (int, error) {
-				return 43, nil
+			DispatchMap: map[string]any{
+				"stop_vm": func(_ context.Context, _ int, _ bool) (int, error) {
+					return 43, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -134,8 +148,10 @@ func TestStopVM(t *testing.T) {
 func TestRestartVM(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			restartVMFn: func(_ context.Context, _ int) (int, error) {
-				return 44, nil
+			DispatchMap: map[string]any{
+				"restart_vm": func(_ context.Context, _ int) (int, error) {
+					return 44, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -157,8 +173,10 @@ func TestRestartVM(t *testing.T) {
 func TestCreateVM(t *testing.T) {
 	t.Run("returns created VM as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			createVMFn: func(_ context.Context, p *truenas.CreateVMParams) (*truenas.VM, error) {
-				return &truenas.VM{ID: 1, Name: p.Name}, nil
+			DispatchMap: map[string]any{
+				"create_vm": func(_ context.Context, p *truenas.CreateVMParams) (*truenas.VM, error) {
+					return &truenas.VM{ID: 1, Name: p.Name}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -188,8 +206,10 @@ func TestCreateVM(t *testing.T) {
 func TestUpdateVM(t *testing.T) {
 	t.Run("returns updated VM as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			updateVMFn: func(_ context.Context, id int, _ *truenas.UpdateVMParams) (*truenas.VM, error) {
-				return &truenas.VM{ID: id}, nil
+			DispatchMap: map[string]any{
+				"update_vm": func(_ context.Context, id int, _ *truenas.UpdateVMParams) (*truenas.VM, error) {
+					return &truenas.VM{ID: id}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -211,8 +231,10 @@ func TestUpdateVM(t *testing.T) {
 func TestListVMDevices(t *testing.T) {
 	t.Run("returns devices as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listVMDevicesFn: func(_ context.Context, _ int) ([]truenas.VMDevice, error) {
-				return []truenas.VMDevice{{ID: 1, VMID: 1}}, nil
+			DispatchMap: map[string]any{
+				"list_vm_devices": func(_ context.Context, _ int) ([]truenas.VMDevice, error) {
+					return []truenas.VMDevice{{ID: 1, VMID: 1}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -234,8 +256,10 @@ func TestListVMDevices(t *testing.T) {
 func TestAddVMDevice(t *testing.T) {
 	t.Run("returns added device as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			addVMDeviceFn: func(_ context.Context, p *truenas.AddVMDeviceParams) (*truenas.VMDevice, error) {
-				return &truenas.VMDevice{ID: 10, VMID: p.VMID}, nil
+			DispatchMap: map[string]any{
+				"add_vm_device": func(_ context.Context, p *truenas.AddVMDeviceParams) (*truenas.VMDevice, error) {
+					return &truenas.VMDevice{ID: 10, VMID: p.VMID}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)

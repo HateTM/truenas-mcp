@@ -10,6 +10,10 @@
 //
 //	TRUENAS_INSECURE          Set to "true" to skip TLS certificate verification
 //	TRUENAS_ALLOW_DESTRUCTIVE Set to "true" to enable destructive tools (default: disabled)
+//	TRUENAS_CALL_TIMEOUT      Per-RPC-call timeout in seconds, applied when a tool call's
+//	                          context has no deadline (default: 60). Raise this if
+//	                          long-running mutations (cloudsync.sync, app.create, app.start)
+//	                          time out client-side under heavy host load.
 //
 // Flags:
 //
@@ -109,9 +113,10 @@ func run() error {
 			ReadTimeout: 60 * time.Second,
 			// ReadHeaderTimeout is a tighter guard against Slowloris attacks.
 			ReadHeaderTimeout: 30 * time.Second,
-			// WriteTimeout must exceed the TrueNAS API client timeout (30s) plus
-			// any job-polling time so that in-flight responses are never cut short.
-			WriteTimeout:   90 * time.Second,
+			// WriteTimeout must exceed the TrueNAS API client timeout (60s by
+			// default, see TRUENAS_CALL_TIMEOUT) plus any job-polling time so
+			// that in-flight responses are never cut short.
+			WriteTimeout:   120 * time.Second,
 			IdleTimeout:    120 * time.Second,
 			MaxHeaderBytes: 1 << 20,
 		}

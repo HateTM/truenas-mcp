@@ -39,9 +39,8 @@ func TestListDatasets_success(t *testing.T) {
 
 	want := []Dataset{
 		{
-			ID:   "Storage/backups",
+			ID:   1,
 			Name: "backups",
-			Pool: "Storage",
 			Type: "FILESYSTEM",
 		},
 	}
@@ -62,7 +61,7 @@ func TestListDatasets_success(t *testing.T) {
 		t.Fatalf("expected 1 dataset, got %d", len(got))
 	}
 	if got[0].ID != want[0].ID {
-		t.Errorf("ID = %q, want %q", got[0].ID, want[0].ID)
+		t.Errorf("ID = %d, want %d", got[0].ID, want[0].ID)
 	}
 }
 
@@ -70,7 +69,7 @@ func TestListDatasets_filterByPool(t *testing.T) {
 	t.Parallel()
 
 	want := []Dataset{
-		{ID: "Storage/backups", Name: "backups", Pool: "Storage", Type: "FILESYSTEM"},
+		{ID: 1, Name: "backups", Type: "FILESYSTEM"},
 	}
 
 	srv := wsTestServer(t, map[string]methodHandler{
@@ -101,18 +100,14 @@ func TestListDatasets_filterByPool(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("expected 1 filtered dataset, got %d", len(got))
 	}
-	if got[0].Pool != "Storage" {
-		t.Errorf("Pool = %q, want %q", got[0].Pool, "Storage")
-	}
 }
 
 func TestGetDataset_success(t *testing.T) {
 	t.Parallel()
 
 	want := Dataset{
-		ID:   "Storage/backups",
+		ID:   1,
 		Name: "backups",
-		Pool: "Storage",
 		Type: "FILESYSTEM",
 	}
 
@@ -129,10 +124,7 @@ func TestGetDataset_success(t *testing.T) {
 		t.Fatalf("GetDataset: %v", err)
 	}
 	if got.ID != want.ID {
-		t.Errorf("ID = %q, want %q", got.ID, want.ID)
-	}
-	if got.Pool != want.Pool {
-		t.Errorf("Pool = %q, want %q", got.Pool, want.Pool)
+		t.Errorf("ID = %d, want %d", got.ID, want.ID)
 	}
 }
 
@@ -157,9 +149,8 @@ func TestCreateDataset_success(t *testing.T) {
 	t.Parallel()
 
 	created := Dataset{
-		ID:   "Storage/backups",
+		ID:   1,
 		Name: "backups",
-		Pool: "Storage",
 		Type: "FILESYSTEM",
 	}
 
@@ -179,7 +170,7 @@ func TestCreateDataset_success(t *testing.T) {
 		t.Fatalf("CreateDataset: %v", err)
 	}
 	if got.ID != created.ID {
-		t.Errorf("ID = %q, want %q", got.ID, created.ID)
+		t.Errorf("ID = %d, want %d", got.ID, created.ID)
 	}
 }
 

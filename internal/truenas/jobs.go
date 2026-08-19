@@ -25,8 +25,8 @@ type Job struct {
 	Error    *string     `json:"error"`
 }
 
-// getJobs fetches the job with the given ID via the core.get_jobs RPC method.
-func (c *Client) getJobs(ctx context.Context, id int) (*Job, error) {
+// GetJob fetches the job with the given ID via the core.get_jobs RPC method.
+func (c *Client) GetJob(ctx context.Context, id int) (*Job, error) {
 	// Filter by integer job ID: [[["id", "=", N]], {}]
 	params := []any{[]any{[]any{"id", "=", id}}, map[string]any{}}
 	var jobs []Job
@@ -49,7 +49,7 @@ func (c *Client) PollJob(ctx context.Context, id int) (*Job, error) {
 	defer timer.Stop()
 
 	for {
-		job, err := c.getJobs(ctx, id)
+		job, err := c.GetJob(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -71,4 +71,12 @@ func (c *Client) PollJob(ctx context.Context, id int) (*Job, error) {
 			timer.Reset(jobPollInterval)
 		}
 	}
+}
+
+// AbortJob aborts a running TrueNAS job by ID.
+func (c *Client) AbortJob(ctx context.Context, id int) error {
+	if err := c.call(ctx, "core.job_abort", []any{id}, nil); err != nil {
+		return fmt.Errorf("aborting job %d: %w", id, err)
+	}
+	return nil
 }

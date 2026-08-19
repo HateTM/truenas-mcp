@@ -11,8 +11,10 @@ import (
 func TestListPools(t *testing.T) {
 	t.Run("returns pools as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listPoolsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.Pool, error) {
-				return []truenas.Pool{{ID: 1, Name: "tank"}}, nil
+			DispatchMap: map[string]any{
+				"list_pools": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.Pool, error) {
+					return []truenas.Pool{{ID: 1, Name: "tank"}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -24,8 +26,10 @@ func TestListPools(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listPoolsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.Pool, error) {
-				return nil, errors.New("API error")
+			DispatchMap: map[string]any{
+				"list_pools": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.Pool, error) {
+					return nil, errors.New("API error")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -39,8 +43,10 @@ func TestListPools(t *testing.T) {
 func TestGetPool(t *testing.T) {
 	t.Run("returns pool as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getPoolFn: func(_ context.Context, id int) (*truenas.Pool, error) {
-				return &truenas.Pool{ID: id, Name: "tank"}, nil
+			DispatchMap: map[string]any{
+				"get_pool": func(_ context.Context, id int) (*truenas.Pool, error) {
+					return &truenas.Pool{ID: id, Name: "tank"}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -60,8 +66,10 @@ func TestGetPool(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getPoolFn: func(_ context.Context, _ int) (*truenas.Pool, error) {
-				return nil, errors.New("pool not found")
+			DispatchMap: map[string]any{
+				"get_pool": func(_ context.Context, _ int) (*truenas.Pool, error) {
+					return nil, errors.New("pool not found")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)

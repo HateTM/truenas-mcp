@@ -11,8 +11,10 @@ import (
 func TestListApps(t *testing.T) {
 	t.Run("returns apps as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listAppsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.App, error) {
-				return []truenas.App{{Name: "jellyfin"}}, nil
+			DispatchMap: map[string]any{
+				"list_apps": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.App, error) {
+					return []truenas.App{{Name: "jellyfin"}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -24,8 +26,10 @@ func TestListApps(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listAppsFn: func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.App, error) {
-				return nil, errors.New("API error")
+			DispatchMap: map[string]any{
+				"list_apps": func(_ context.Context, _ ...truenas.ListOptions) ([]truenas.App, error) {
+					return nil, errors.New("API error")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -39,8 +43,10 @@ func TestListApps(t *testing.T) {
 func TestGetApp(t *testing.T) {
 	t.Run("returns app as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getAppFn: func(_ context.Context, name string) (*truenas.App, error) {
-				return &truenas.App{Name: name}, nil
+			DispatchMap: map[string]any{
+				"get_app": func(_ context.Context, name string) (*truenas.App, error) {
+					return &truenas.App{Name: name}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -60,8 +66,10 @@ func TestGetApp(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getAppFn: func(_ context.Context, _ string) (*truenas.App, error) {
-				return nil, errors.New("app not found")
+			DispatchMap: map[string]any{
+				"get_app": func(_ context.Context, _ string) (*truenas.App, error) {
+					return nil, errors.New("app not found")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -75,8 +83,10 @@ func TestGetApp(t *testing.T) {
 func TestStartApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			startAppFn: func(_ context.Context, _ string) (int, error) {
-				return 10, nil
+			DispatchMap: map[string]any{
+				"start_app": func(_ context.Context, _ string) (int, error) {
+					return 10, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -98,8 +108,10 @@ func TestStartApp(t *testing.T) {
 func TestStopApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			stopAppFn: func(_ context.Context, _ string) (int, error) {
-				return 11, nil
+			DispatchMap: map[string]any{
+				"stop_app": func(_ context.Context, _ string) (int, error) {
+					return 11, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -121,8 +133,10 @@ func TestStopApp(t *testing.T) {
 func TestRestartApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			restartAppFn: func(_ context.Context, _ string) (int, error) {
-				return 12, nil
+			DispatchMap: map[string]any{
+				"restart_app": func(_ context.Context, _ string) (int, error) {
+					return 12, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -144,8 +158,10 @@ func TestRestartApp(t *testing.T) {
 func TestListImages(t *testing.T) {
 	t.Run("returns images as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listImagesFn: func(_ context.Context) ([]truenas.Image, error) {
-				return []truenas.Image{{ID: "jellyfin/jellyfin:latest"}}, nil
+			DispatchMap: map[string]any{
+				"list_images": func(_ context.Context) ([]truenas.Image, error) {
+					return []truenas.Image{{ID: "jellyfin/jellyfin:latest"}}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -157,8 +173,10 @@ func TestListImages(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			listImagesFn: func(_ context.Context) ([]truenas.Image, error) {
-				return nil, errors.New("docker not available")
+			DispatchMap: map[string]any{
+				"list_images": func(_ context.Context) ([]truenas.Image, error) {
+					return nil, errors.New("docker not available")
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -172,8 +190,10 @@ func TestListImages(t *testing.T) {
 func TestInstallApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			createAppFn: func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
-				return 20, nil
+			DispatchMap: map[string]any{
+				"create_app": func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
+					return 20, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -206,8 +226,10 @@ func TestInstallApp(t *testing.T) {
 func TestInstallCustomApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			createAppFn: func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
-				return 21, nil
+			DispatchMap: map[string]any{
+				"create_app": func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
+					return 21, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -235,8 +257,10 @@ func TestInstallCustomApp(t *testing.T) {
 func TestUpgradeApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			upgradeAppFn: func(_ context.Context, _, _ string) (int, error) {
-				return 30, nil
+			DispatchMap: map[string]any{
+				"upgrade_app": func(_ context.Context, _, _ string) (int, error) {
+					return 30, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -258,8 +282,10 @@ func TestUpgradeApp(t *testing.T) {
 func TestUpgradeSummary(t *testing.T) {
 	t.Run("returns summary as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			getUpgradeSummaryFn: func(_ context.Context, name string) (*truenas.AppUpgradeSummary, error) {
-				return &truenas.AppUpgradeSummary{LatestVersion: "1.2.0"}, nil
+			DispatchMap: map[string]any{
+				"get_upgrade_summary": func(_ context.Context, name string) (*truenas.AppUpgradeSummary, error) {
+					return &truenas.AppUpgradeSummary{LatestVersion: "1.2.0"}, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -281,8 +307,10 @@ func TestUpgradeSummary(t *testing.T) {
 func TestRollbackApp(t *testing.T) {
 	t.Run("returns job ID as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			rollbackAppFn: func(_ context.Context, _, _ string) (int, error) {
-				return 31, nil
+			DispatchMap: map[string]any{
+				"rollback_app": func(_ context.Context, _, _ string) (int, error) {
+					return 31, nil
+				},
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
