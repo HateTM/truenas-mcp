@@ -73,10 +73,10 @@ func TestGetVM(t *testing.T) {
 }
 
 func TestStartVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			startVMFn: func(_ context.Context, _ int) (int, error) {
-				return 42, nil
+			startVMFn: func(_ context.Context, _ int) error {
+				return nil
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -96,8 +96,8 @@ func TestStartVM(t *testing.T) {
 
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			startVMFn: func(_ context.Context, _ int) (int, error) {
-				return 0, errors.New("VM already running")
+			startVMFn: func(_ context.Context, _ int) error {
+				return errors.New("VM already running")
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -109,10 +109,10 @@ func TestStartVM(t *testing.T) {
 }
 
 func TestStopVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			stopVMFn: func(_ context.Context, _ int, _ bool) (int, error) {
-				return 43, nil
+			stopVMFn: func(_ context.Context, _ int, _ bool) error {
+				return nil
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)
@@ -132,10 +132,10 @@ func TestStopVM(t *testing.T) {
 }
 
 func TestRestartVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
-			restartVMFn: func(_ context.Context, _ int) (int, error) {
-				return 44, nil
+			restartVMFn: func(_ context.Context, _ int) error {
+				return nil
 			},
 		}
 		cs, cleanup := connectTestServer(t, mock)

@@ -56,17 +56,16 @@ func registerVMTools(s *mcp.Server, client truenasClient) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "start_vm",
-		Description: "Start a virtual machine by its numeric ID. Returns the async job ID immediately (non-blocking).",
+		Description: "Start a virtual machine by its numeric ID. Blocks until TrueNAS finishes starting the VM.",
 		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: false},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, p startVMInput) (*mcp.CallToolResult, any, error) {
 		if p.ID <= 0 {
 			return errorResult(errors.New("start_vm: id must be a positive integer"))
 		}
-		jobID, err := client.StartVM(ctx, p.ID)
-		if err != nil {
+		if err := client.StartVM(ctx, p.ID); err != nil {
 			return errorResult(fmt.Errorf("start_vm: %w", err))
 		}
-		return jsonResult(map[string]int{"job_id": jobID})
+		return jsonResult(map[string]bool{"success": true})
 	})
 
 	type stopVMInput struct {
@@ -76,17 +75,16 @@ func registerVMTools(s *mcp.Server, client truenasClient) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "stop_vm",
-		Description: "Stop a virtual machine by its numeric ID. Set force=true to forcibly terminate without a graceful shutdown. Returns the async job ID immediately (non-blocking).",
+		Description: "Stop a virtual machine by its numeric ID. Set force=true to forcibly terminate without a graceful shutdown. Blocks until TrueNAS finishes stopping the VM.",
 		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: false},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, p stopVMInput) (*mcp.CallToolResult, any, error) {
 		if p.ID <= 0 {
 			return errorResult(errors.New("stop_vm: id must be a positive integer"))
 		}
-		jobID, err := client.StopVM(ctx, p.ID, p.Force)
-		if err != nil {
+		if err := client.StopVM(ctx, p.ID, p.Force); err != nil {
 			return errorResult(fmt.Errorf("stop_vm: %w", err))
 		}
-		return jsonResult(map[string]int{"job_id": jobID})
+		return jsonResult(map[string]bool{"success": true})
 	})
 
 	type restartVMInput struct {
@@ -95,17 +93,16 @@ func registerVMTools(s *mcp.Server, client truenasClient) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "restart_vm",
-		Description: "Restart a virtual machine by its numeric ID. Returns the async job ID immediately (non-blocking).",
+		Description: "Restart a virtual machine by its numeric ID. Blocks until TrueNAS finishes restarting the VM.",
 		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: false},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, p restartVMInput) (*mcp.CallToolResult, any, error) {
 		if p.ID <= 0 {
 			return errorResult(errors.New("restart_vm: id must be a positive integer"))
 		}
-		jobID, err := client.RestartVM(ctx, p.ID)
-		if err != nil {
+		if err := client.RestartVM(ctx, p.ID); err != nil {
 			return errorResult(fmt.Errorf("restart_vm: %w", err))
 		}
-		return jsonResult(map[string]int{"job_id": jobID})
+		return jsonResult(map[string]bool{"success": true})
 	})
 
 	type createVMInput struct {

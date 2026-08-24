@@ -94,20 +94,19 @@ func TestGetVM_notFound(t *testing.T) {
 func TestStartVM_success(t *testing.T) {
 	t.Parallel()
 
+	// TrueNAS SCALE's /api/current JSON-RPC endpoint blocks server-side until
+	// the vm.start operation completes and returns a null result — not an
+	// async job ID.
 	srv := wsTestServer(t, map[string]methodHandler{
 		"vm.start": func(_ json.RawMessage) (any, *rpcError) {
-			return 42, nil
+			return nil, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.StartVM(context.Background(), 1)
-	if err != nil {
+	if err := c.StartVM(context.Background(), 1); err != nil {
 		t.Fatalf("StartVM: %v", err)
-	}
-	if jobID != 42 {
-		t.Errorf("jobID = %d, want 42", jobID)
 	}
 }
 
@@ -116,18 +115,14 @@ func TestStopVM_success(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"vm.stop": func(_ json.RawMessage) (any, *rpcError) {
-			return 43, nil
+			return nil, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.StopVM(context.Background(), 1, false)
-	if err != nil {
+	if err := c.StopVM(context.Background(), 1, false); err != nil {
 		t.Fatalf("StopVM: %v", err)
-	}
-	if jobID != 43 {
-		t.Errorf("jobID = %d, want 43", jobID)
 	}
 }
 
@@ -136,18 +131,14 @@ func TestRestartVM_success(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"vm.restart": func(_ json.RawMessage) (any, *rpcError) {
-			return 44, nil
+			return nil, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.RestartVM(context.Background(), 1)
-	if err != nil {
+	if err := c.RestartVM(context.Background(), 1); err != nil {
 		t.Fatalf("RestartVM: %v", err)
-	}
-	if jobID != 44 {
-		t.Errorf("jobID = %d, want 44", jobID)
 	}
 }
 
