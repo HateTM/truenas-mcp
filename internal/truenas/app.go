@@ -96,35 +96,37 @@ func (c *Client) GetApp(ctx context.Context, name string) (*App, error) {
 	return &app, nil
 }
 
-// StartApp starts the app with the given name and returns the async job ID.
-// The job can be polled for completion using PollJob.
-func (c *Client) StartApp(ctx context.Context, name string) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "app.start", []any{name}, &jobID); err != nil {
-		return 0, fmt.Errorf("starting app %q: %w", name, err)
+// StartApp starts the app with the given name. The underlying app.start RPC
+// call blocks server-side until the operation completes (or fails) and
+// carries no result payload.
+func (c *Client) StartApp(ctx context.Context, name string) error {
+	if err := c.call(ctx, "app.start", []any{name}, nil); err != nil {
+		return fmt.Errorf("starting app %q: %w", name, err)
 	}
-	return jobID, nil
+	return nil
 }
 
-// StopApp stops the app with the given name and returns the async job ID.
-// The job can be polled for completion using PollJob.
-func (c *Client) StopApp(ctx context.Context, name string) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "app.stop", []any{name}, &jobID); err != nil {
-		return 0, fmt.Errorf("stopping app %q: %w", name, err)
+// StopApp stops the app with the given name. The underlying app.stop RPC call
+// blocks server-side until the operation completes (or fails) and carries no
+// result payload.
+func (c *Client) StopApp(ctx context.Context, name string) error {
+	if err := c.call(ctx, "app.stop", []any{name}, nil); err != nil {
+		return fmt.Errorf("stopping app %q: %w", name, err)
 	}
-	return jobID, nil
+	return nil
 }
 
-// RestartApp redeploys (restarts) the app with the given name and returns the async job ID.
-// TrueNAS SCALE uses app.redeploy (not app.restart) for this operation.
-// The job can be polled for completion using PollJob.
-func (c *Client) RestartApp(ctx context.Context, name string) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "app.redeploy", []any{name}, &jobID); err != nil {
-		return 0, fmt.Errorf("restarting app %q: %w", name, err)
+// RestartApp redeploys (restarts) the app with the given name and returns the
+// app entry as it stands after redeployment completes.
+// TrueNAS SCALE uses app.redeploy (not app.restart) for this operation. The
+// RPC call blocks server-side until redeployment finishes; it does not return
+// an async job ID.
+func (c *Client) RestartApp(ctx context.Context, name string) (*App, error) {
+	var app App
+	if err := c.call(ctx, "app.redeploy", []any{name}, &app); err != nil {
+		return nil, fmt.Errorf("restarting app %q: %w", name, err)
 	}
-	return jobID, nil
+	return &app, nil
 }
 
 // ListImages returns all Docker images stored on the TrueNAS SCALE system.
@@ -156,27 +158,28 @@ type CreateAppParams struct {
 	Values map[string]any `json:"values,omitempty"`
 }
 
-// CreateApp starts installing a new TrueNAS app and returns the async job ID once the
-// job is accepted. The returned job ID can be polled for completion using PollJob.
-func (c *Client) CreateApp(ctx context.Context, params *CreateAppParams) (int, error) {
+// CreateApp installs a new TrueNAS app and returns the resulting app entry.
+// The underlying app.create RPC call blocks server-side until installation
+// completes; it does not return an async job ID.
+func (c *Client) CreateApp(ctx context.Context, params *CreateAppParams) (*App, error) {
 	if params == nil {
-		return 0, fmt.Errorf("creating app: params must not be nil")
+		return nil, fmt.Errorf("creating app: params must not be nil")
 	}
 	if err := validateAppName(params.AppName, "app_name"); err != nil {
-		return 0, err
+		return nil, err
 	}
 	if !params.CustomApp && params.CatalogApp == "" {
-		return 0, fmt.Errorf("creating app: catalog_app is required when custom_app is false")
+		return nil, fmt.Errorf("creating app: catalog_app is required when custom_app is false")
 	}
 	if params.CustomApp && params.CustomComposeConfigString == "" {
-		return 0, fmt.Errorf("creating app: custom_compose_config_string is required when custom_app is true")
+		return nil, fmt.Errorf("creating app: custom_compose_config_string is required when custom_app is true")
 	}
 
-	var jobID int
-	if err := c.call(ctx, "app.create", []any{params}, &jobID); err != nil {
-		return 0, fmt.Errorf("creating app %q: %w", params.AppName, err)
+	var app App
+	if err := c.call(ctx, "app.create", []any{params}, &app); err != nil {
+		return nil, fmt.Errorf("creating app %q: %w", params.AppName, err)
 	}
-	return jobID, nil
+	return &app, nil
 }
 
 // DeleteApp permanently removes the named app from TrueNAS SCALE.
@@ -191,16 +194,18 @@ func (c *Client) DeleteApp(ctx context.Context, name string) error {
 }
 
 // UpgradeApp upgrades the named app to the given version, or to the latest available
-// version when version is empty. Returns the async job ID.
-func (c *Client) UpgradeApp(ctx context.Context, name, version string) (int, error) {
+// version when version is empty. Returns the app entry as it stands after the
+// upgrade completes; the underlying app.upgrade RPC call blocks server-side
+// until then and does not return an async job ID.
+func (c *Client) UpgradeApp(ctx context.Context, name, version string) (*App, error) {
 	if err := validateAppName(name, "name"); err != nil {
-		return 0, err
+		return nil, err
 	}
-	var jobID int
-	if err := c.call(ctx, "app.upgrade", []any{name, &AppUpgradeParams{AppVersion: version}}, &jobID); err != nil {
-		return 0, fmt.Errorf("upgrading app %q: %w", name, err)
+	var app App
+	if err := c.call(ctx, "app.upgrade", []any{name, &AppUpgradeParams{AppVersion: version}}, &app); err != nil {
+		return nil, fmt.Errorf("upgrading app %q: %w", name, err)
 	}
-	return jobID, nil
+	return &app, nil
 }
 
 // GetUpgradeSummary retrieves the upgrade summary for the named app.
@@ -221,20 +226,22 @@ func (c *Client) GetUpgradeSummary(ctx context.Context, name string) (*AppUpgrad
 	return &summary, nil
 }
 
-// RollbackApp rolls the named app back to the specified previous version.
-// Returns the async job ID.
-func (c *Client) RollbackApp(ctx context.Context, name, version string) (int, error) {
+// RollbackApp rolls the named app back to the specified previous version and
+// returns the app entry as it stands after the rollback completes. The
+// underlying app.rollback RPC call blocks server-side until then and does not
+// return an async job ID.
+func (c *Client) RollbackApp(ctx context.Context, name, version string) (*App, error) {
 	if err := validateAppName(name, "name"); err != nil {
-		return 0, err
+		return nil, err
 	}
 	if version == "" {
-		return 0, fmt.Errorf("rolling back app: version must not be empty")
+		return nil, fmt.Errorf("rolling back app: version must not be empty")
 	}
-	var jobID int
-	if err := c.call(ctx, "app.rollback", []any{name, &AppUpgradeParams{AppVersion: version}}, &jobID); err != nil {
-		return 0, fmt.Errorf("rolling back app %q: %w", name, err)
+	var app App
+	if err := c.call(ctx, "app.rollback", []any{name, &AppUpgradeParams{AppVersion: version}}, &app); err != nil {
+		return nil, fmt.Errorf("rolling back app %q: %w", name, err)
 	}
-	return jobID, nil
+	return &app, nil
 }
 
 // noUpgradeAvailable reports whether err indicates TrueNAS found no pending
