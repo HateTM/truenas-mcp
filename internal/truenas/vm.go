@@ -103,35 +103,35 @@ func (c *Client) GetVM(ctx context.Context, id int) (*VM, error) {
 	return &vm, nil
 }
 
-// StartVM starts the VM with the given ID and returns the async job ID.
-// The job can be polled for completion using PollJob.
-func (c *Client) StartVM(ctx context.Context, id int) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "vm.start", []any{id}, &jobID); err != nil {
-		return 0, fmt.Errorf("starting VM %d: %w", id, err)
+// StartVM starts the VM with the given ID. The underlying vm.start RPC call
+// blocks server-side until the operation completes (or fails) and carries no
+// result payload.
+func (c *Client) StartVM(ctx context.Context, id int) error {
+	if err := c.call(ctx, "vm.start", []any{id}, nil); err != nil {
+		return fmt.Errorf("starting VM %d: %w", id, err)
 	}
-	return jobID, nil
+	return nil
 }
 
-// StopVM stops the VM with the given ID and returns the async job ID.
-// Set force to true to forcibly terminate without a graceful shutdown.
-// The job can be polled for completion using PollJob.
-func (c *Client) StopVM(ctx context.Context, id int, force bool) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "vm.stop", []any{id, stopBody{Force: force}}, &jobID); err != nil {
-		return 0, fmt.Errorf("stopping VM %d: %w", id, err)
+// StopVM stops the VM with the given ID. Set force to true to forcibly
+// terminate without a graceful shutdown. The underlying vm.stop RPC call
+// blocks server-side until the operation completes (or fails) and carries no
+// result payload.
+func (c *Client) StopVM(ctx context.Context, id int, force bool) error {
+	if err := c.call(ctx, "vm.stop", []any{id, stopBody{Force: force}}, nil); err != nil {
+		return fmt.Errorf("stopping VM %d: %w", id, err)
 	}
-	return jobID, nil
+	return nil
 }
 
-// RestartVM restarts the VM with the given ID and returns the async job ID.
-// The job can be polled for completion using PollJob.
-func (c *Client) RestartVM(ctx context.Context, id int) (int, error) {
-	var jobID int
-	if err := c.call(ctx, "vm.restart", []any{id}, &jobID); err != nil {
-		return 0, fmt.Errorf("restarting VM %d: %w", id, err)
+// RestartVM restarts the VM with the given ID. The underlying vm.restart RPC
+// call blocks server-side until the operation completes (or fails) and
+// carries no result payload.
+func (c *Client) RestartVM(ctx context.Context, id int) error {
+	if err := c.call(ctx, "vm.restart", []any{id}, nil); err != nil {
+		return fmt.Errorf("restarting VM %d: %w", id, err)
 	}
-	return jobID, nil
+	return nil
 }
 
 // CreateVM creates a new virtual machine and returns it.

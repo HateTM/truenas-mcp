@@ -81,11 +81,11 @@ func TestGetApp(t *testing.T) {
 }
 
 func TestStartApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"start_app": func(_ context.Context, _ string) (int, error) {
-					return 10, nil
+				"start_app": func(_ context.Context, _ string) error {
+					return nil
 				},
 			},
 		}
@@ -106,11 +106,11 @@ func TestStartApp(t *testing.T) {
 }
 
 func TestStopApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"stop_app": func(_ context.Context, _ string) (int, error) {
-					return 11, nil
+				"stop_app": func(_ context.Context, _ string) error {
+					return nil
 				},
 			},
 		}
@@ -131,11 +131,11 @@ func TestStopApp(t *testing.T) {
 }
 
 func TestRestartApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns app entry as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"restart_app": func(_ context.Context, _ string) (int, error) {
-					return 12, nil
+				"restart_app": func(_ context.Context, name string) (*truenas.App, error) {
+					return &truenas.App{Name: name, State: "DEPLOYING"}, nil
 				},
 			},
 		}
@@ -188,11 +188,11 @@ func TestListImages(t *testing.T) {
 }
 
 func TestInstallApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns app entry as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"create_app": func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
-					return 20, nil
+				"create_app": func(_ context.Context, params *truenas.CreateAppParams) (*truenas.App, error) {
+					return &truenas.App{Name: params.AppName, State: "DEPLOYING"}, nil
 				},
 			},
 		}
@@ -224,11 +224,11 @@ func TestInstallApp(t *testing.T) {
 }
 
 func TestInstallCustomApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns app entry as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"create_app": func(_ context.Context, _ *truenas.CreateAppParams) (int, error) {
-					return 21, nil
+				"create_app": func(_ context.Context, params *truenas.CreateAppParams) (*truenas.App, error) {
+					return &truenas.App{Name: params.AppName, State: "DEPLOYING"}, nil
 				},
 			},
 		}
@@ -255,11 +255,11 @@ func TestInstallCustomApp(t *testing.T) {
 }
 
 func TestUpgradeApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns app entry as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"upgrade_app": func(_ context.Context, _, _ string) (int, error) {
-					return 30, nil
+				"upgrade_app": func(_ context.Context, name, _ string) (*truenas.App, error) {
+					return &truenas.App{Name: name, State: "DEPLOYING"}, nil
 				},
 			},
 		}
@@ -305,11 +305,11 @@ func TestUpgradeSummary(t *testing.T) {
 }
 
 func TestRollbackApp(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns app entry as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"rollback_app": func(_ context.Context, _, _ string) (int, error) {
-					return 31, nil
+				"rollback_app": func(_ context.Context, name, _ string) (*truenas.App, error) {
+					return &truenas.App{Name: name, State: "DEPLOYING"}, nil
 				},
 			},
 		}

@@ -77,24 +77,23 @@ func TestGetApp_notFound(t *testing.T) {
 func TestStartApp_success(t *testing.T) {
 	t.Parallel()
 
+	// TrueNAS SCALE's /api/current JSON-RPC endpoint blocks server-side until
+	// the app.start job completes and returns a null result — not an async
+	// job ID.
 	srv := wsTestServer(t, map[string]methodHandler{
 		"app.start": func(params json.RawMessage) (any, *rpcError) {
 			var p []string
 			if err := json.Unmarshal(params, &p); err != nil || len(p) != 1 || p[0] != "nginx" {
 				return nil, &rpcError{Code: -32600, Message: "wrong params"}
 			}
-			return 10, nil
+			return nil, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.StartApp(context.Background(), "nginx")
-	if err != nil {
+	if err := c.StartApp(context.Background(), "nginx"); err != nil {
 		t.Fatalf("StartApp: %v", err)
-	}
-	if jobID != 10 {
-		t.Errorf("jobID = %d, want 10", jobID)
 	}
 }
 
@@ -107,21 +106,21 @@ func TestStopApp_success(t *testing.T) {
 			if err := json.Unmarshal(params, &p); err != nil || len(p) != 1 || p[0] != "nginx" {
 				return nil, &rpcError{Code: -32600, Message: "wrong params"}
 			}
-			return 11, nil
+			return nil, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.StopApp(context.Background(), "nginx")
-	if err != nil {
+	if err := c.StopApp(context.Background(), "nginx"); err != nil {
 		t.Fatalf("StopApp: %v", err)
-	}
-	if jobID != 11 {
-		t.Errorf("jobID = %d, want 11", jobID)
 	}
 }
 
+// TestRestartApp_success reproduces the reported bug's real cause: TrueNAS
+// SCALE 25.10.x's /api/current endpoint blocks app.redeploy server-side until
+// the job completes and returns the resulting App entity (AppEntry), not an
+// async job ID. RestartApp must decode that object, not an int.
 func TestRestartApp_success(t *testing.T) {
 	t.Parallel()
 
@@ -131,18 +130,21 @@ func TestRestartApp_success(t *testing.T) {
 			if err := json.Unmarshal(params, &p); err != nil || len(p) != 1 || p[0] != "nginx" {
 				return nil, &rpcError{Code: -32600, Message: "wrong params"}
 			}
-			return 12, nil
+			return App{Name: "nginx", State: "DEPLOYING"}, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.RestartApp(context.Background(), "nginx")
+	got, err := c.RestartApp(context.Background(), "nginx")
 	if err != nil {
 		t.Fatalf("RestartApp: %v", err)
 	}
-	if jobID != 12 {
-		t.Errorf("jobID = %d, want 12", jobID)
+	if got.Name != "nginx" {
+		t.Errorf("Name = %q, want %q", got.Name, "nginx")
+	}
+	if got.State != "DEPLOYING" {
+		t.Errorf("State = %q, want %q", got.State, "DEPLOYING")
 	}
 }
 
@@ -179,13 +181,13 @@ func TestCreateApp_catalogSuccess(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"app.create": func(_ json.RawMessage) (any, *rpcError) {
-			return 42, nil
+			return App{Name: "my-jellyfin", State: "DEPLOYING"}, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.CreateApp(context.Background(), &CreateAppParams{
+	got, err := c.CreateApp(context.Background(), &CreateAppParams{
 		AppName:    "my-jellyfin",
 		CatalogApp: "jellyfin",
 		Train:      "stable",
@@ -194,8 +196,8 @@ func TestCreateApp_catalogSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateApp: %v", err)
 	}
-	if jobID != 42 {
-		t.Errorf("jobID = %d, want 42", jobID)
+	if got.Name != "my-jellyfin" {
+		t.Errorf("Name = %q, want %q", got.Name, "my-jellyfin")
 	}
 }
 
@@ -204,13 +206,13 @@ func TestCreateApp_customSuccess(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"app.create": func(_ json.RawMessage) (any, *rpcError) {
-			return 7, nil
+			return App{Name: "my-custom-app", State: "DEPLOYING"}, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.CreateApp(context.Background(), &CreateAppParams{
+	got, err := c.CreateApp(context.Background(), &CreateAppParams{
 		AppName:                   "my-custom-app",
 		CustomApp:                 true,
 		CustomComposeConfigString: "services:\n  web:\n    image: nginx\n",
@@ -218,8 +220,8 @@ func TestCreateApp_customSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateApp: %v", err)
 	}
-	if jobID != 7 {
-		t.Errorf("jobID = %d, want 7", jobID)
+	if got.Name != "my-custom-app" {
+		t.Errorf("Name = %q, want %q", got.Name, "my-custom-app")
 	}
 }
 
@@ -320,18 +322,18 @@ func TestUpgradeApp_success(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"app.upgrade": func(_ json.RawMessage) (any, *rpcError) {
-			return 20, nil
+			return App{Name: "my-app", State: "DEPLOYING"}, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.UpgradeApp(context.Background(), "my-app", "")
+	got, err := c.UpgradeApp(context.Background(), "my-app", "")
 	if err != nil {
 		t.Fatalf("UpgradeApp: %v", err)
 	}
-	if jobID != 20 {
-		t.Errorf("jobID = %d, want 20", jobID)
+	if got.Name != "my-app" {
+		t.Errorf("Name = %q, want %q", got.Name, "my-app")
 	}
 }
 
@@ -427,18 +429,18 @@ func TestRollbackApp_success(t *testing.T) {
 
 	srv := wsTestServer(t, map[string]methodHandler{
 		"app.rollback": func(_ json.RawMessage) (any, *rpcError) {
-			return 21, nil
+			return App{Name: "my-app", State: "DEPLOYING"}, nil
 		},
 	})
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	jobID, err := c.RollbackApp(context.Background(), "my-app", "1.9.0")
+	got, err := c.RollbackApp(context.Background(), "my-app", "1.9.0")
 	if err != nil {
 		t.Fatalf("RollbackApp: %v", err)
 	}
-	if jobID != 21 {
-		t.Errorf("jobID = %d, want 21", jobID)
+	if got.Name != "my-app" {
+		t.Errorf("Name = %q, want %q", got.Name, "my-app")
 	}
 }
 

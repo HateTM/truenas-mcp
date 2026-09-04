@@ -81,11 +81,11 @@ func TestGetVM(t *testing.T) {
 }
 
 func TestStartVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"start_vm": func(_ context.Context, _ int) (int, error) {
-					return 42, nil
+				"start_vm": func(_ context.Context, _ int) error {
+					return nil
 				},
 			},
 		}
@@ -107,8 +107,8 @@ func TestStartVM(t *testing.T) {
 	t.Run("propagates error", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"start_vm": func(_ context.Context, _ int) (int, error) {
-					return 0, errors.New("VM already running")
+				"start_vm": func(_ context.Context, _ int) error {
+					return errors.New("VM already running")
 				},
 			},
 		}
@@ -121,11 +121,11 @@ func TestStartVM(t *testing.T) {
 }
 
 func TestStopVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"stop_vm": func(_ context.Context, _ int, _ bool) (int, error) {
-					return 43, nil
+				"stop_vm": func(_ context.Context, _ int, _ bool) error {
+					return nil
 				},
 			},
 		}
@@ -146,11 +146,11 @@ func TestStopVM(t *testing.T) {
 }
 
 func TestRestartVM(t *testing.T) {
-	t.Run("returns job ID as JSON", func(t *testing.T) {
+	t.Run("returns success as JSON", func(t *testing.T) {
 		mock := &mockTruenasClient{
 			DispatchMap: map[string]any{
-				"restart_vm": func(_ context.Context, _ int) (int, error) {
-					return 44, nil
+				"restart_vm": func(_ context.Context, _ int) error {
+					return nil
 				},
 			},
 		}

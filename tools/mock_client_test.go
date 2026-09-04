@@ -443,28 +443,16 @@ func (m *mockTruenasClient) GetVM(ctx context.Context, id int) (*truenas.VM, err
 	return &res, nil
 }
 
-func (m *mockTruenasClient) StartVM(ctx context.Context, id int) (int, error) {
-	var res int
-	if err := m.call(ctx, "start_vm", id, &res); err != nil {
-		return 0, err
-	}
-	return res, nil
+func (m *mockTruenasClient) StartVM(ctx context.Context, id int) error {
+	return m.call(ctx, "start_vm", id, nil)
 }
 
-func (m *mockTruenasClient) StopVM(ctx context.Context, id int, force bool) (int, error) {
-	var res int
-	if err := m.call(ctx, "stop_vm", []any{id, force}, &res); err != nil {
-		return 0, err
-	}
-	return res, nil
+func (m *mockTruenasClient) StopVM(ctx context.Context, id int, force bool) error {
+	return m.call(ctx, "stop_vm", []any{id, force}, nil)
 }
 
-func (m *mockTruenasClient) RestartVM(ctx context.Context, id int) (int, error) {
-	var res int
-	if err := m.call(ctx, "restart_vm", id, &res); err != nil {
-		return 0, err
-	}
-	return res, nil
+func (m *mockTruenasClient) RestartVM(ctx context.Context, id int) error {
+	return m.call(ctx, "restart_vm", id, nil)
 }
 
 func (m *mockTruenasClient) CreateVM(ctx context.Context, params *truenas.CreateVMParams) (*truenas.VM, error) {
@@ -523,28 +511,20 @@ func (m *mockTruenasClient) GetApp(ctx context.Context, name string) (*truenas.A
 	return &res, nil
 }
 
-func (m *mockTruenasClient) StartApp(ctx context.Context, name string) (int, error) {
-	var res int
-	if err := m.call(ctx, "start_app", name, &res); err != nil {
-		return 0, err
-	}
-	return res, nil
+func (m *mockTruenasClient) StartApp(ctx context.Context, name string) error {
+	return m.call(ctx, "start_app", name, nil)
 }
 
-func (m *mockTruenasClient) StopApp(ctx context.Context, name string) (int, error) {
-	var res int
-	if err := m.call(ctx, "stop_app", name, &res); err != nil {
-		return 0, err
-	}
-	return res, nil
+func (m *mockTruenasClient) StopApp(ctx context.Context, name string) error {
+	return m.call(ctx, "stop_app", name, nil)
 }
 
-func (m *mockTruenasClient) RestartApp(ctx context.Context, name string) (int, error) {
-	var res int
+func (m *mockTruenasClient) RestartApp(ctx context.Context, name string) (*truenas.App, error) {
+	var res truenas.App
 	if err := m.call(ctx, "restart_app", name, &res); err != nil {
-		return 0, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (m *mockTruenasClient) ListImages(ctx context.Context) ([]truenas.Image, error) {
@@ -555,24 +535,24 @@ func (m *mockTruenasClient) ListImages(ctx context.Context) ([]truenas.Image, er
 	return res, nil
 }
 
-func (m *mockTruenasClient) CreateApp(ctx context.Context, params *truenas.CreateAppParams) (int, error) {
-	var res int
+func (m *mockTruenasClient) CreateApp(ctx context.Context, params *truenas.CreateAppParams) (*truenas.App, error) {
+	var res truenas.App
 	if err := m.call(ctx, "create_app", params, &res); err != nil {
-		return 0, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (m *mockTruenasClient) DeleteApp(ctx context.Context, name string) error {
 	return m.call(ctx, "delete_app", name, nil)
 }
 
-func (m *mockTruenasClient) UpgradeApp(ctx context.Context, name, version string) (int, error) {
-	var res int
+func (m *mockTruenasClient) UpgradeApp(ctx context.Context, name, version string) (*truenas.App, error) {
+	var res truenas.App
 	if err := m.call(ctx, "upgrade_app", []any{name, version}, &res); err != nil {
-		return 0, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (m *mockTruenasClient) GetUpgradeSummary(ctx context.Context, name string) (*truenas.AppUpgradeSummary, error) {
@@ -583,12 +563,12 @@ func (m *mockTruenasClient) GetUpgradeSummary(ctx context.Context, name string) 
 	return &res, nil
 }
 
-func (m *mockTruenasClient) RollbackApp(ctx context.Context, name, version string) (int, error) {
-	var res int
+func (m *mockTruenasClient) RollbackApp(ctx context.Context, name, version string) (*truenas.App, error) {
+	var res truenas.App
 	if err := m.call(ctx, "rollback_app", []any{name, version}, &res); err != nil {
-		return 0, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (m *mockTruenasClient) ListInterfaces(ctx context.Context) ([]truenas.Interface, error) {
