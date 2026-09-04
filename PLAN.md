@@ -215,6 +215,19 @@ hardening pass.
 
 ---
 
+## PR 3 — Fill API Gaps
+
+**Goal**: Implement missing CRUD operations for datasets, pools, and network interfaces.
+
+**Tasks**:
+- [ ] Add `DeleteDataset`, `UpdateDataset` to `internal/truenas/dataset.go`
+- [ ] Add `CreatePool`, `DeletePool`, `UpdatePool` to `internal/truenas/pool.go`
+- [ ] Add `GetInterface`, `UpdateInterface` to `internal/truenas/network.go`
+- [ ] Update `tools/` layer to register new tools
+- [ ] Update `README.md`
+
+---
+
 ## Security Rules
 
 - No credentials in source — env vars only

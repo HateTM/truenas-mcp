@@ -12,14 +12,10 @@ func TestListPools_success(t *testing.T) {
 
 	want := []Pool{
 		{
-			ID:      1,
-			Name:    "Storage",
-			GUID:    "1234567890",
-			Status:  "ONLINE",
-			Path:    "/mnt/Storage",
-			Healthy: true,
-			Size:    31988916420608,
-			Free:    27102360289280,
+			ID:     1,
+			Name:   "Storage",
+			GUID:   "1234567890",
+			Status: "ONLINE",
 		},
 	}
 
@@ -41,20 +37,15 @@ func TestListPools_success(t *testing.T) {
 	if got[0].Name != want[0].Name {
 		t.Errorf("Name = %q, want %q", got[0].Name, want[0].Name)
 	}
-	if got[0].Free != want[0].Free {
-		t.Errorf("Free = %d, want %d", got[0].Free, want[0].Free)
-	}
 }
 
 func TestGetPool_success(t *testing.T) {
 	t.Parallel()
 
 	want := Pool{
-		ID:      1,
-		Name:    "Storage",
-		Status:  "ONLINE",
-		Healthy: true,
-		Size:    31988916420608,
+		ID:     1,
+		Name:   "Storage",
+		Status: "ONLINE",
 	}
 
 	srv := wsTestServer(t, map[string]methodHandler{
@@ -71,9 +62,6 @@ func TestGetPool_success(t *testing.T) {
 	}
 	if got.Name != want.Name {
 		t.Errorf("Name = %q, want %q", got.Name, want.Name)
-	}
-	if got.Size != want.Size {
-		t.Errorf("Size = %d, want %d", got.Size, want.Size)
 	}
 }
 

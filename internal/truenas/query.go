@@ -4,12 +4,6 @@ import "fmt"
 
 // ListOptions controls optional server-side pagination for TrueNAS list endpoints.
 // Zero values mean "return all results" (no limit, no offset).
-type ListOptions struct {
-	// Limit caps the number of results returned by the server. Zero means no limit.
-	Limit int
-	// Offset skips the first N results. Zero means start from the beginning.
-	Offset int
-}
 
 // validateListOptions returns an error if opts contains negative pagination values.
 // Callers must validate before passing opts to buildQueryParams so that negative

@@ -90,4 +90,28 @@ func registerDatasetTools(s *mcp.Server, client truenasClient) {
 		}
 		return jsonResult(dataset)
 	})
+
+	type updateDatasetInput struct {
+		ID       string `json:"id"       jsonschema:"Full dataset path, e.g. Storage/backups"`
+		Comments string `json:"comments" jsonschema:"New dataset description"`
+		Quota    int64  `json:"quota"    jsonschema:"New quota in bytes (0 = no quota)"`
+	}
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "update_dataset",
+		Description: "Update a ZFS dataset's description (comments) or quota.",
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: false},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p updateDatasetInput) (*mcp.CallToolResult, any, error) {
+		if p.ID == "" {
+			return errorResult(errors.New("update_dataset: id is required"))
+		}
+		dataset, err := client.UpdateDataset(ctx, p.ID, &truenas.UpdateDatasetParams{
+			Comments: p.Comments,
+			Quota:    p.Quota,
+		})
+		if err != nil {
+			return errorResult(fmt.Errorf("update_dataset: %w", err))
+		}
+		return jsonResult(dataset)
+	})
 }
