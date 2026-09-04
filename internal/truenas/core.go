@@ -15,7 +15,7 @@ type CoreDownloadResult struct {
 // Ping checks connectivity to the TrueNAS server.
 func (c *Client) Ping(ctx context.Context) (string, error) {
 	var pong string
-	if err := c.call(ctx, "core.ping", nil, &pong); err != nil {
+	if err := c.call(ctx, "core.ping", []any{}, &pong); err != nil {
 		return "", fmt.Errorf("pinging server: %w", err)
 	}
 	return pong, nil

@@ -176,12 +176,15 @@ func registerAppManagementTools(s *mcp.Server, client truenasClient) {
 		return jsonResult(space)
 	})
 
+	type appConfigInput struct {
+		AppName string `json:"app_name" jsonschema:"App name (as shown in the TrueNAS UI)"`
+	}
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "app_config",
-		Description: "Get the App catalog's global configuration.",
+		Description: "Get the user-specified configuration (values) of a single app by name.",
 		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
-	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ emptyInput) (*mcp.CallToolResult, any, error) {
-		cfg, err := client.AppConfigGet(ctx)
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, p appConfigInput) (*mcp.CallToolResult, any, error) {
+		cfg, err := client.AppConfigGet(ctx, p.AppName)
 		if err != nil {
 			return errorResult(fmt.Errorf("app_config: %w", err))
 		}

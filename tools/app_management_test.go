@@ -95,10 +95,11 @@ func TestAppMetadataTools(t *testing.T) {
 				return []string{"media", "networking"}, nil
 			},
 			"app_available_space": func(_ context.Context) (*truenas.AppAvailableSpace, error) {
-				return &truenas.AppAvailableSpace{FreeBytes: 1024}, nil
+				space := truenas.AppAvailableSpace(1024)
+				return &space, nil
 			},
-			"app_config": func(_ context.Context) (*truenas.AppGlobalConfig, error) {
-				return &truenas.AppGlobalConfig{Pool: "Storage"}, nil
+			"app_config": func(_ context.Context, appName string) (map[string]any, error) {
+				return map[string]any{"app_name": appName, "pool": "Storage"}, nil
 			},
 			"app_container_ids": func(_ context.Context, appName string) ([]string, error) {
 				return []string{appName + "-container-1"}, nil
@@ -124,7 +125,7 @@ func TestAppMetadataTools(t *testing.T) {
 		assertResultJSON(t, callTool(t, cs, "app_available_space", nil))
 	})
 	t.Run("config", func(t *testing.T) {
-		assertResultJSON(t, callTool(t, cs, "app_config", nil))
+		assertResultJSON(t, callTool(t, cs, "app_config", map[string]any{"app_name": "jellyfin"}))
 	})
 	t.Run("container_ids", func(t *testing.T) {
 		res := callTool(t, cs, "app_container_ids", map[string]any{"app_name": "jellyfin"})

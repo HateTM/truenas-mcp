@@ -251,7 +251,7 @@ type truenasClient interface {
 	GetAppImage(ctx context.Context, id string) (*truenas.Image, error)
 	AppCategories(ctx context.Context) ([]string, error)
 	AppAvailableSpaceGet(ctx context.Context) (*truenas.AppAvailableSpace, error)
-	AppConfigGet(ctx context.Context) (*truenas.AppGlobalConfig, error)
+	AppConfigGet(ctx context.Context, appName string) (map[string]any, error)
 	AppContainerIDs(ctx context.Context, appName string) ([]string, error)
 	ConvertAppToCustom(ctx context.Context, appName string) (*truenas.App, error)
 	AppOutdatedDockerImages(ctx context.Context, appName string) ([]string, error)

@@ -36,15 +36,9 @@ type DockerHubRateLimit struct {
 	RemainingLimit int `json:"remaining_limit,omitempty"`
 }
 
-// AppAvailableSpace reports free space available to the App catalog's storage pool.
-type AppAvailableSpace struct {
-	FreeBytes int64 `json:"free_bytes,omitempty"`
-}
+// AppAvailableSpace reports free space (in bytes) available to the App catalog's storage pool.
+type AppAvailableSpace int64
 
-// AppGlobalConfig represents the App catalog's global configuration.
-type AppGlobalConfig struct {
-	Pool string `json:"pool,omitempty"`
-}
 
 // ListAppRegistries lists configured private container registries.
 func (c *Client) ListAppRegistries(ctx context.Context, opts ...ListOptions) ([]AppRegistry, error) {
@@ -115,7 +109,7 @@ func (c *Client) PullAppImage(ctx context.Context, p *PullAppImageParams) (int, 
 // AppImageDockerHubRateLimitGet returns the App catalog's current Docker Hub pull rate limit usage.
 func (c *Client) AppImageDockerHubRateLimitGet(ctx context.Context) (*DockerHubRateLimit, error) {
 	var limit DockerHubRateLimit
-	if err := c.call(ctx, "app.image.dockerhub_rate_limit", nil, &limit); err != nil {
+	if err := c.call(ctx, "app.image.dockerhub_rate_limit", []any{}, &limit); err != nil {
 		return nil, fmt.Errorf("getting app image dockerhub rate limit: %w", err)
 	}
 	return &limit, nil
@@ -133,7 +127,7 @@ func (c *Client) GetAppImage(ctx context.Context, id string) (*Image, error) {
 // AppCategories returns the categories apps in the catalog can belong to.
 func (c *Client) AppCategories(ctx context.Context) ([]string, error) {
 	var categories []string
-	if err := c.call(ctx, "app.categories", nil, &categories); err != nil {
+	if err := c.call(ctx, "app.categories", []any{}, &categories); err != nil {
 		return nil, fmt.Errorf("listing app categories: %w", err)
 	}
 	return categories, nil
@@ -142,19 +136,20 @@ func (c *Client) AppCategories(ctx context.Context) ([]string, error) {
 // AppAvailableSpaceGet returns free space available to the App catalog's storage pool.
 func (c *Client) AppAvailableSpaceGet(ctx context.Context) (*AppAvailableSpace, error) {
 	var space AppAvailableSpace
-	if err := c.call(ctx, "app.available_space", nil, &space); err != nil {
+	if err := c.call(ctx, "app.available_space", []any{}, &space); err != nil {
 		return nil, fmt.Errorf("getting app available space: %w", err)
 	}
 	return &space, nil
 }
 
-// AppConfigGet returns the App catalog's global configuration.
-func (c *Client) AppConfigGet(ctx context.Context) (*AppGlobalConfig, error) {
-	var cfg AppGlobalConfig
-	if err := c.call(ctx, "app.config", nil, &cfg); err != nil {
-		return nil, fmt.Errorf("getting app config: %w", err)
+// AppConfigGet returns the user-specified configuration (values) of a single app by name.
+// The shape is app-specific, so it is returned as a raw map.
+func (c *Client) AppConfigGet(ctx context.Context, appName string) (map[string]any, error) {
+	var cfg map[string]any
+	if err := c.call(ctx, "app.config", []any{appName}, &cfg); err != nil {
+		return nil, fmt.Errorf("getting app config for %q: %w", appName, err)
 	}
-	return &cfg, nil
+	return cfg, nil
 }
 
 // AppContainerIDs returns the container IDs backing a running app.

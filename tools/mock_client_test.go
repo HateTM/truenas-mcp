@@ -1581,12 +1581,12 @@ func (m *mockTruenasClient) AppAvailableSpaceGet(ctx context.Context) (*truenas.
 	return &res, nil
 }
 
-func (m *mockTruenasClient) AppConfigGet(ctx context.Context) (*truenas.AppGlobalConfig, error) {
-	var res truenas.AppGlobalConfig
-	if err := m.call(ctx, "app_config", nil, &res); err != nil {
+func (m *mockTruenasClient) AppConfigGet(ctx context.Context, appName string) (map[string]any, error) {
+	var res map[string]any
+	if err := m.call(ctx, "app_config", appName, &res); err != nil {
 		return nil, err
 	}
-	return &res, nil
+	return res, nil
 }
 
 func (m *mockTruenasClient) AppContainerIDs(ctx context.Context, appName string) ([]string, error) {
