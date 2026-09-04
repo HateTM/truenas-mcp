@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -60,7 +61,7 @@ func TestListDatasets_success(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("expected 1 dataset, got %d", len(got))
 	}
-	if got[0].ID != want[0].ID {
+	if fmt.Sprint(got[0].ID) != fmt.Sprint(want[0].ID) {
 		t.Errorf("ID = %d, want %d", got[0].ID, want[0].ID)
 	}
 }
@@ -123,7 +124,7 @@ func TestGetDataset_success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetDataset: %v", err)
 	}
-	if got.ID != want.ID {
+	if fmt.Sprint(got.ID) != fmt.Sprint(want.ID) {
 		t.Errorf("ID = %d, want %d", got.ID, want.ID)
 	}
 }
@@ -169,7 +170,7 @@ func TestCreateDataset_success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateDataset: %v", err)
 	}
-	if got.ID != created.ID {
+	if fmt.Sprint(got.ID) != fmt.Sprint(created.ID) {
 		t.Errorf("ID = %d, want %d", got.ID, created.ID)
 	}
 }
