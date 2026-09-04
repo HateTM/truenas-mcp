@@ -38,7 +38,7 @@ type DiskInfo struct {
 
 // Dataset represents a ZFS dataset or zvol.
 type Dataset struct {
-	ID          int        `json:"id"`
+	ID          any        `json:"id"` // int (<=24.04) or name string (25.10+)
 	Name        string     `json:"name"`
 	GUID        string     `json:"guid"`
 	Type        string     `json:"type"`
@@ -64,11 +64,36 @@ func (v DatasetValue) MarshalJSON() ([]byte, error) {
 
 func (v *DatasetValue) UnmarshalJSON(b []byte) error {
 	var s string
-	if err := json.Unmarshal(b, &s); err != nil {
-		return err
+	if err := json.Unmarshal(b, &s); err == nil {
+		v.Value = s
+		v.RawValue = s
+		return nil
 	}
-	v.Value = s
-	v.RawValue = s
+	// TrueNAS 25.10+ returns property objects for some fields (quota):
+	// {"value": null, "rawvalue": "0", "source": "DEFAULT", ...}
+	var obj struct {
+		Value    any `json:"value"`
+		RawValue any `json:"rawvalue"`
+	}
+	if err := json.Unmarshal(b, &obj); err == nil {
+		if s, ok := obj.RawValue.(string); ok {
+			v.RawValue = s
+		}
+		if s, ok := obj.Value.(string); ok {
+			v.Value = s
+		}
+		if v.Value == "" {
+			v.Value = v.RawValue
+		}
+		if v.Value == "" && v.RawValue == "" {
+			v.Value, v.RawValue = string(b), string(b)
+		}
+		return nil
+	}
+	// Bare numbers, objects or booleans; keep the raw JSON as the string value.
+	raw := string(b)
+	v.Value = raw
+	v.RawValue = raw
 	return nil
 }
 
